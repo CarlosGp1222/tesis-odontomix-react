@@ -2,7 +2,7 @@ export default function Login() {
   return (
     <>
       <h1 className="text-4xl font-black text-indigo-900">Inicia Sesión</h1>
-      <p className="text-cyan-600 font-black">Inicia sesión con tus credenciales</p>
+      <p className="text-cyan-600 font-black pl-2">Inicia sesión con tus credenciales</p>
 
       <div className="bg-white drop-shadow-2xl rounded-md px-5 py-10">
         <form action="">
