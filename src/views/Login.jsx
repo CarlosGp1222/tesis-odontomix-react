@@ -1,8 +1,8 @@
 export default function Login() {
   return (
     <>
-      <h1 className="text-4xl font-black text-indigo-900">Inicia Sesión</h1>
-      <p className="text-cyan-600 font-black pl-2">Inicia sesión con tus credenciales</p>
+      <h1 className="text-4xl font-black text-center text-indigo-900">Iniciar Sesión</h1>
+      {/* <p className="text-cyan-600 font-black text-center pl-2">Inicia sesión con tus credenciales</p> */}
 
       <div className="bg-white drop-shadow-2xl rounded-md px-5 py-10">
         <form action="">
@@ -17,7 +17,7 @@ export default function Login() {
               type="email" 
               id="email"
               name="email"
-              className="w-full p-3 mt-2 bg-gray-200"
+              className="w-full p-3 mt-2 bg-gray-200 rounded-md"
               placeholder="Ingresa tu correo electrónico"
             />
           </div>
@@ -32,14 +32,14 @@ export default function Login() {
               type="password" 
               id="password"
               name="password"
-              className="w-full p-3 mt-2 bg-gray-200"
+              className="w-full p-3 mt-2 bg-gray-200 rounded-md"
               placeholder="Ingresa tu contraseña"
             />
           </div>
           <input 
             type="submit" 
             value="Iniciar sesión"
-            className="bg-indigo-900 hover:bg-indigo-950 text-white w-full mt-5 p-3 uppercase font-bold cursor-pointer"
+            className="bg-indigo-900 hover:bg-indigo-950 text-white w-full mt-5 p-3 rounded-md uppercase font-bold cursor-pointer"
           />
         </form>
       </div>
