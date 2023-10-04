@@ -1,47 +1,38 @@
-import React, { useState } from 'react';
+import { createRef,useState } from 'react';
 
 export default function Crearcliente() {
-    const [formData, setFormData] = useState({
-        ididentificacion: 'cedula',
-        nombres_cliente: '',
-        apellidos_cliente: '',
-        identificacion_cliente: '',
-        genero_cliente: '',
-        edad_cliente: '',
-        telefono_cliente: '',
-        correo_cliente: ''
-    });
+    const ididentificacion = createRef();
+    const identificacion_cliente = createRef();
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
-    };
+    
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
+        const datos = {
+            ididentificacion: ididentificacion.current.value,
+            identificacion_cliente: identificacion_cliente.current.value,
+        };
+        console.log(datos);
         // Procesa los datos del formulario (por ejemplo, enviar a un servidor)
-        console.log(formData);
+        
     };
 
-    const identificacionValidation = () => {
-        if (formData.identificacion_cliente !== '') {
-            switch (formData.ididentificacion) {
-                case 'cedula':
-                    return formData.identificacion_cliente.length <= 10 && formData.identificacion_cliente.length > 9 && /^[0-9]*$/.test(formData.identificacion_cliente);
-                case 'ruc':
-                    return formData.identificacion_cliente.length <= 13 && formData.identificacion_cliente.length > 12 && /^[0-9]*$/.test(formData.identificacion_cliente);
-                case 'pasaporte':
-                    return formData.identificacion_cliente.length <= 9;
-                default:
-                    return true;
-            }
-        }else{
-            return true;
-        }
-    };
+    // const identificacionValidation = () => {
+    //     if (formData.identificacion_cliente !== '') {
+    //         switch (formData.ididentificacion) {
+    //             case '1':
+    //                 return formData.identificacion_cliente.length <= 10 && formData.identificacion_cliente.length > 9 && /^[0-9]*$/.test(formData.identificacion_cliente);
+    //             case '2':
+    //                 return formData.identificacion_cliente.length <= 13 && formData.identificacion_cliente.length > 12 && /^[0-9]*$/.test(formData.identificacion_cliente);
+    //             case '3':
+    //                 return formData.identificacion_cliente.length <= 9;
+    //             default:
+    //                 return true;
+    //         }
+    //     }else{
+    //         return true;
+    //     }
+    // };
 
     return (
         <form onSubmit={handleFormSubmit} className="p-4">
@@ -50,13 +41,12 @@ export default function Crearcliente() {
                 <select
                     id="ididentificacion"
                     name="ididentificacion"
-                    value={formData.ididentificacion}
-                    onChange={handleInputChange}
                     className="w-full px-3 py-2 border rounded-md"
+                    ref={ididentificacion}
                 >
-                    <option value="cedula">Cédula</option>
-                    <option value="ruc">RUC</option>
-                    <option value="pasaporte">Pasaporte</option>
+                    <option value="1">Cédula</option>
+                    <option value="2">RUC</option>
+                    <option value="3">Pasaporte</option>
                 </select>
             </div>
             {/* ... otros campos del formulario ... */}
@@ -66,14 +56,14 @@ export default function Crearcliente() {
                     type="text"
                     id="identificacion_cliente"
                     name="identificacion_cliente"
-                    value={formData.identificacion_cliente}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-md ${identificacionValidation() ? '' : 'border-red-500'}`}
+                    className={`w-full px-3 py-2 border rounded-md `}
+                    // ${identificacionValidation() ? '' : 'border-red-500'}
+                    ref={identificacion_cliente}
                 />
-                {!identificacionValidation() && <span className="text-red-500 text-sm">Formato de identificación inválido.</span>}
+                {/* {!identificacionValidation() && <span className="text-red-500 text-sm">Formato de identificación inválido.</span>} */}
             </div>
             {/* ... otros campos del formulario ... */}
             <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md">Enviar</button>
         </form>
-    );
+    )
 }

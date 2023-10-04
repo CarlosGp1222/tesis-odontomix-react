@@ -1,6 +1,7 @@
 import DatabaseSimulator from "../../data/DatabaseSimulator"
 import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa'; // Importando íconos de Font Awesome
+import { Link } from "react-router-dom";
 export default function Vistacliente() {
 
     const db = new DatabaseSimulator();
@@ -9,13 +10,17 @@ export default function Vistacliente() {
     useEffect(() => {        
         setClientes(db.getAllClientes());
     }, []);
+
     
     return (
         <div className="min-w-full overflow-hidden rounded-lg shadow p-4">
+            <div className="mb-4 mt-4">
+                <h3 className="text-gray-600 text-3xl font-medium text-center font-serif">Lista de Clientes</h3>                
+            </div>
             <div className="flex justify-end mb-4">
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center">
+                <Link to={"/cliente/crear-cliente"} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center">
                     <FaPlus className="mr-2" /> Agregar Cliente
-                </button>
+                </Link>
             </div>
             <table className="min-w-full leading-normal">
                 <thead>
@@ -24,8 +29,9 @@ export default function Vistacliente() {
                             Nombres y Apellidos
                         </th>
                         <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Identificación
+                           Tipo Identificación
                         </th>
+                        
                         <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Género
                         </th>
@@ -49,16 +55,17 @@ export default function Vistacliente() {
                             <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-serif text-center">
                                 {cliente.nombres_cliente} {cliente.apellidos_cliente}
                             </td>
-                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-mono text-center">
+                            
+                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-mono text-right">
                                 {cliente.identificacion_cliente}
                             </td>
                             <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-serif text-center">
                                 {cliente.genero_cliente}
                             </td>
-                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-mono text-center">
+                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-mono text-right">
                                 {cliente.edad_cliente}
                             </td>
-                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-mono text-center">
+                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-mono text-right">
                                 {cliente.telefono_cliente}
                             </td>
                             <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-serif text-center">

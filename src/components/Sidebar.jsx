@@ -16,13 +16,13 @@ export default function Sidebar() {
   return (
     <div className="min-h-screen flex">
       {/* Menú Lateral */}
-      <div className="bg-gray-300 w-64 space-y-6 py-7 px-5 border-r-4 bg-slate-800 text-white">
+      <div className="w-64 space-y-6 py-7 px-5 border-r-4 bg-slate-800 text-white">
         <Link to="/" className="text-xl font-semibold text-cyan-600 border-b-2 border-cyan-600 pb-2">
           <img src="../img/odontomixSinFondo.png" alt="Logotipo menu" />
         </Link>
         <ul>
           <li className="" >
-            <button onClick={() => handleMenuClick('crear')} className="block w-full text-left py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white">Cliente</button>
+            <button onClick={() => handleMenuClick('crear')} className='block w-full text-left py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white'>Cliente</button>
             {activeMenu === 'crear' && (
               <ul className="ml-5 space-y-2 mt-2">
                 <li><Link to="/cliente/vista-cliente" className="block py-2 px-4 rounded transition duration-200 hover:bg-indigo-500 hover:text-white">Lista de clientes</Link></li>

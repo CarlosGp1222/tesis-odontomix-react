@@ -4,8 +4,9 @@ class DatabaseSimulator {
         this.data = [
             {
                 id: 1,
-                nombres_cliente: 'Juan',
-                apellidos_cliente: 'Pérez',
+                nombres_cliente: 'Carlos José',
+                apellidos_cliente: 'González Parrales',
+                ididentificacion: '1',
                 identificacion_cliente: '1234567890',
                 genero_cliente: 'Masculino',
                 edad_cliente: '30',
