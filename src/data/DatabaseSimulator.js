@@ -23,7 +23,7 @@ class DatabaseSimulator {
     }
 
     // Agregar un nuevo cliente
-    addCliente(cliente) {
+    addCliente(cliente) {        
         const newId = this.data.length > 0 ? this.data[this.data.length - 1].id + 1 : 1;
         const newCliente = {
             id: newId,

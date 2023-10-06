@@ -1,4 +1,4 @@
-import DatabaseSimulator from "../../data/DatabaseSimulator"
+import DatabaseSimulator from "../../data/DatabaseSimulator";
 import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa'; // Importando íconos de Font Awesome
 import useDental from "../../hooks/useDental";
@@ -6,16 +6,13 @@ import useDental from "../../hooks/useDental";
 
 export default function Vistacliente() {
 
-    
-    const db = new DatabaseSimulator();
-    const { handleClickModal } = useDental();
+    const { handleClickModal, handleClientes } = useDental();
     const [clientes, setClientes] = useState([]);
     
-    useEffect(() => {        
-        setClientes(db.getAllClientes());
+    useEffect(() => {          
+        setClientes(handleClientes);
     }, []);
 
-    
     return (
         <div className="min-w-full overflow-hidden rounded-lg shadow p-4">
             <div className="mb-4 mt-4">

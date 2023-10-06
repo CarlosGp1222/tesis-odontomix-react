@@ -16,6 +16,8 @@ const customStyles = {
   },
 };
 
+Modal.setAppElement('#root');
+
 export default function Layout() {
   const { modal } = useDental();
   return (
