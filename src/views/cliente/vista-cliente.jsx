@@ -1,7 +1,7 @@
 import DatabaseSimulator from "../../data/DatabaseSimulator"
 import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa'; // Importando íconos de Font Awesome
-import  useDental  from "../../hooks/useDental";
+import useDental from "../../hooks/useDental";
 
 
 export default function Vistacliente() {
@@ -22,7 +22,7 @@ export default function Vistacliente() {
                 <h3 className="text-gray-600 text-3xl font-medium text-center font-serif">Lista de Clientes</h3>                
             </div>
             <div className="flex justify-end mb-4">
-                <button className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded flex items-center">
+                <button onClick={handleClickModal} className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded flex items-center">
                     <FaPlus className="mr-2" /> Agregar Cliente
                 </button>
             </div>

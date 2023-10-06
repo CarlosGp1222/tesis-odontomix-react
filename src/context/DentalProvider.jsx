@@ -20,6 +20,7 @@ const DentalProvider = ({children}) => {
         </DentalContext.Provider>
     )
 }
+
 export {
     DentalProvider
 }

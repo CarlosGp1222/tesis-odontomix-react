@@ -3,19 +3,21 @@ import { Outlet, useLocation } from "react-router-dom"
 import Modal from 'react-modal'
 import Sidebar from "../components/Sidebar";
 import useDental from "../hooks/useDental";
+import ClienteModal from "../components/ClienteModal";
 const customStyles = {
   content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    transform: 'translate(-50%, -50%)',
+    width: '80%',
+    maxWidth: '800px'
   },
 };
 
 export default function Layout() {
-  // const { modal } = useDental();
+  const { modal } = useDental();
   return (
     <>
       <div className="min-h-screen flex">
@@ -24,8 +26,8 @@ export default function Layout() {
           <Outlet />
         </div>
       </div>
-      <Modal isOpen={false} style={customStyles} >
-        
+      <Modal isOpen={modal} style={customStyles} >
+        <ClienteModal />
       </Modal>
     </>
   )
