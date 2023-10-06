@@ -1,8 +1,8 @@
-// import { useContext } from "react";
-// import DentalP
+import { useContext } from "react";
+import DentalContext from "../context/DentalProvider";
 
-// const useQuiosco = () => {
-//     return useContext(QuioscoContext);
-// }
+const useDental = () => {    
+    return useContext(DentalContext);
+}
 
-// export default useQuiosco;
+export default useDental;

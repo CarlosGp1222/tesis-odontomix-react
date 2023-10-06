@@ -5,10 +5,10 @@ const DentalContext = createContext();
 const DentalProvider = ({children}) => {
     const [modal, setModal] = useState(false);
 
-
     const handleClickModal = () => {
         setModal(!modal);
     }
+
     return (
         <DentalContext.Provider
             value={{
