@@ -4,9 +4,7 @@ import AuthLayout from './layouts/AuthLayout';
 import Layout from './layouts/Layout';
 import Inicio from './views/Inicio';
 import Login from './views/Login';
-import Crearcliente from './views/cliente/crear-cliente';
 import Vistacliente from './views/cliente/vista-cliente';
-import CrearPaciente from './views/paciente/crear-paciente';
 import VistaPaciente from './views/paciente/vista-paciente';
 
 const router = createBrowserRouter([
@@ -23,15 +21,6 @@ const router = createBrowserRouter([
                 path: '/listar-cliente',
                 element: <Vistacliente />,
             },
-            {
-                path: '/crear-cliente',
-                element: <Crearcliente />,
-            },
-            //Paciente
-            {
-                path: '/crear-paciente',
-                element: <h1>Crear Paciente</h1>,
-            }
         ],
     },
     // Clientes
@@ -43,10 +32,6 @@ const router = createBrowserRouter([
                 path: '/cliente/vista-cliente',
                 element: <Vistacliente />,
             },
-            {
-                path: '/cliente/crear-cliente',
-                element: <Crearcliente />,
-            },
         ],
     },
     {
@@ -56,10 +41,6 @@ const router = createBrowserRouter([
             {
                 path: '/paciente/vista-paciente',
                 element: <VistaPaciente />,
-            },
-            {
-                path: '/paciente/crear-paciente',
-                element: <CrearPaciente />,
             },
         ],
     },

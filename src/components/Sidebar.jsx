@@ -23,7 +23,6 @@ export default function Sidebar() {
     if (activeMenu === menuName) {
       setActiveSubMenu(null);  // Si el menú ya está activo, lo cerramos.
     } else {
-      console.log(menuName);
       setActiveSubMenu(menuName);  // Si no, abrimos el menú seleccionado.
     }
   };
@@ -37,7 +36,7 @@ export default function Sidebar() {
           <button onClick={() => handleMenuClick('crear')} className={`flex flex-1 items-center w-full text-left py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white ${isPathActive('/vista') ? 'bg-cyan-600' : (activeMenu === 'crear' ? 'bg-cyan-600' : '')}`}>Clientes-Pacientes {activeMenu === 'crear' ? <AiOutlineCaretUp className='ml-9' /> : <AiOutlineCaretDown className='ml-9' />}</button>
         
           {(activeMenu === 'crear'  && (
-            <ul className="ml-5 space-y-2 mt-2">
+            <ul className="ml-5 space-y-2 mt-2 mb-3">
               <li onClick={() => handleSubMenuClick('vista-cliente')}><Link to="/cliente/vista-cliente" className={`block py-2 px-4 rounded transition duration-200 hover:bg-indigo-500 hover:text-white ${isPathActive('/cliente') ? 'bg-indigo-500' : (activeSubMenu === 'crear-cliente' ? 'bg-indigo-500' : '')}`}>Lista de clientes</Link></li>
               <li onClick={() => handleSubMenuClick('crear-paciente')}><Link to="/paciente/vista-paciente" className={`block py-2 px-4 rounded transition duration-200 hover:bg-indigo-500 hover:text-white ${isPathActive('/paciente') ? 'bg-indigo-500' : (activeSubMenu === 'crear-paciente' ? 'bg-indigo-500' : '')}`}>Lista de paciente</Link></li>
             </ul>

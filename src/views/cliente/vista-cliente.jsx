@@ -6,17 +6,23 @@ import useDental from "../../hooks/useDental";
 
 export default function Vistacliente() {
 
-    const { handleClickModal, handleClientes } = useDental();
+    const { handleClickModal, handleGetDatos, handleDatosActual, handleTipoModal, handleEliminarDatos, refresh } = useDental();
     const [clientes, setClientes] = useState([]);
+    const [error, setError] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await handleGetDatos('api/clientes');
+            setClientes(data);
+        };
+        fetchData();
+        handleTipoModal('cliente');
+    }, [refresh]);
     
-    useEffect(() => {          
-        setClientes(handleClientes);
-    }, []);
 
     return (
         <div className="min-w-full overflow-hidden rounded-lg shadow p-4">
             <div className="mb-4 mt-4">
-                <h3 className="text-gray-600 text-3xl font-medium text-center font-serif">Lista de Clientes</h3>                
+                <h3 className="text-gray-600 text-3xl font-medium text-center font-serif">Lista de Clientes</h3>
             </div>
             <div className="flex justify-end mb-4">
                 <button onClick={handleClickModal} className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded flex items-center">
@@ -32,7 +38,7 @@ export default function Vistacliente() {
                         <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Identificación
                         </th>
-                        
+
                         <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Género
                         </th>
@@ -51,39 +57,47 @@ export default function Vistacliente() {
                     </tr>
                 </thead>
                 <tbody>
-                    {clientes.map(cliente => (
-                        <tr key={cliente.identificacion_cliente}>
-                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-serif text-center">
-                                {cliente.nombres_cliente} {cliente.apellidos_cliente}
-                            </td>
-                            
-                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-mono text-right">
-                                {cliente.identificacion_cliente}
-                            </td>
-                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-serif text-center">
-                                {cliente.genero_cliente}
-                            </td>
-                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-mono text-right">
-                                {cliente.edad_cliente}
-                            </td>
-                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-mono text-right">
-                                {cliente.telefono_cliente}
-                            </td>
-                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-serif text-center">
-                                {cliente.correo_cliente}
-                            </td>
-                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                <button className="text-blue-500 hover:text-blue-700 mr-4">
-                                    <FaEdit />
-                                </button>
-                                <button className="text-red-500 hover:text-red-700">
-                                    <FaTrash />
-                                </button>
+                    {clientes.length === 0 ? (
+                        <tr>
+                            <td colSpan="7" className="px-5 py-5 border-b border-gray-200 bg-white text-base font-serif text-center">
+                                No hay ningún paciente aún
                             </td>
                         </tr>
-                    ))}
+                    ) : (  
+
+                    clientes.map(cliente => (
+                    <tr key={cliente.identificacion_cliente}>
+                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-serif text-center">
+                            {cliente.nombre_cliente} {cliente.apellidos_cliente}
+                        </td>
+
+                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-mono text-right">
+                            {cliente.identificacion_cliente}
+                        </td>
+                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-serif text-center">
+                            {cliente.genero_cliente}
+                        </td>
+                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-mono text-right">
+                            {cliente.edad_cliente}
+                        </td>
+                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-mono text-right">
+                            {cliente.telefono_cliente}
+                        </td>
+                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-serif text-center">
+                            {cliente.correo_cliente}
+                        </td>
+                        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <button onClick={(event) => handleDatosActual(cliente)} className="text-blue-500 hover:text-blue-700 mr-4">
+                                <FaEdit />
+                            </button>
+                            <button onClick={(event) => handleEliminarDatos(cliente.id_cliente, 'cliente')} className="text-red-500 hover:text-red-700">
+                                <FaTrash />
+                            </button>
+                        </td>
+                    </tr>
+                    ) ))}
                 </tbody>
             </table>
         </div>
-    );
+    )
 }

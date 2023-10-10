@@ -1,9 +1,12 @@
 import { Outlet, useLocation } from "react-router-dom"
-
+import { ToastContainer } from 'react-toastify';
 import Modal from 'react-modal'
 import Sidebar from "../components/Sidebar";
 import useDental from "../hooks/useDental";
 import ClienteModal from "../components/ClienteModal";
+import "react-toastify/dist/ReactToastify.css";
+import 'sweetalert2/src/sweetalert2.scss'
+import PacienteModal from "../components/PacienteModal";
 const customStyles = {
   content: {
     top: '50%',
@@ -19,7 +22,7 @@ const customStyles = {
 Modal.setAppElement('#root');
 
 export default function Layout() {
-  const { modal } = useDental();
+  const { modal, tipoModal } = useDental();
   return (
     <>
       <div className="min-h-screen flex">
@@ -29,8 +32,10 @@ export default function Layout() {
         </div>
       </div>
       <Modal isOpen={modal} style={customStyles} >
-        <ClienteModal />
+        {tipoModal == 'cliente' ? <ClienteModal /> : null}
+        {tipoModal == 'paciente' ? <PacienteModal /> : null}
       </Modal>
+      <ToastContainer />
     </>
   )
 }
