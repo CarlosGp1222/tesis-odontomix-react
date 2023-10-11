@@ -22,7 +22,7 @@ export default function ClienteModal() {
 
     const { handleClickModal, handleIngresarDatos, datosActual, handleEditarDatos } = useDental();
 
-    console.log(datosActual.id_cliente);
+    console.log(datosActual.idcliente);
     const handleEnviarCliente = e => {
         e.preventDefault();
         const datos = {
@@ -36,10 +36,10 @@ export default function ClienteModal() {
             direccion_cliente: direccion_cliente.current.value,
             correo_cliente: correo_cliente.current.value,
         };
-        if (datosActual.id_cliente != null) {
-            handleEditarDatos(datosActual.id_cliente, datos, 'cliente');
+        if (datosActual.idcliente != null) {
+            handleEditarDatos(datosActual.idcliente, datos, 'api/clientes');
         } else {
-            handleIngresarDatos(datos, 'api/cliente');
+            handleIngresarDatos(datos, 'api/clientes');
             toast.info(`Cliente ${datos.nombre_cliente +" "+ datos.apellidos_cliente} creado correctamente`);
         }
         
@@ -94,10 +94,10 @@ export default function ClienteModal() {
                     <FaTimes />
                 </button>
             </div>
-            <h2 className="text-center mb-4 text-xl font-bold">{datosActual.id_cliente ? 'Actualizar cliente' : 'Crear cliente'}</h2>
+            <h2 className="text-center mb-4 text-xl font-bold">{datosActual.idcliente ? 'Actualizar cliente' : 'Crear cliente'}</h2>
             <form onSubmit={handleEnviarCliente} className="bg-white p-4 rounded grid grid-cols-2 gap-4">
                 <div
-                    className={`${datosActual.id_cliente ? 'hidden': ''}`}
+                    className={`${datosActual.idcliente ? 'hidden': ''}`}
                 >
                     <label className="block text-gray-700 text-sm font-bold mb-2">Identificación:</label>
                     <select defaultValue={datosActual ? datosActual.ididentificacion : ''} ref={ididentificacion} onChange={handleValidaIdentificacion} name="ididentificacion" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
@@ -115,7 +115,7 @@ export default function ClienteModal() {
                     <input defaultValue={datosActual ? datosActual.apellidos_cliente : ''} ref={apellidos_cliente} type="text" name="apellidos_cliente" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                 </div>
                 <div
-                    className={`${datosActual.id_cliente ? 'hidden': ''}`}
+                    className={`${datosActual.idcliente ? 'hidden': ''}`}
                 >
                     <label className="block text-gray-700 text-sm font-bold mb-2">Identificación cliente:</label>
                     <input defaultValue={datosActual ? datosActual.identificacion_cliente : ''} ref={identificacion_cliente} onChange={handleValidaIdentificacion} type="text" name="identificacion_cliente" className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outlin ${validate ? '' : 'border-red-500'}`} />
@@ -147,7 +147,7 @@ export default function ClienteModal() {
                 </div>
                 <div className="col-span-2 flex justify-end">
                     <button type="submit" className="bg-slate-800 text-white px-6 py-2 rounded-full hover:bg-slate-900 focus:outline-none focus:bg-slate-900">
-                        {datosActual.id_cliente ? 'Actualizar' : 'Crear'}
+                        {datosActual.idcliente ? 'Actualizar' : 'Crear'}
                     </button>
                 </div>
             </form>

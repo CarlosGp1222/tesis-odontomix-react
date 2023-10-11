@@ -27,7 +27,8 @@ const DentalProvider = ({children}) => {
     }
 
 
-    const handleDatosActual = (cliente) => {;
+    const handleDatosActual = (cliente) => {
+        console.log(cliente);
         setDatosActual(cliente);
         handleClickModal();
     }
@@ -47,8 +48,7 @@ const DentalProvider = ({children}) => {
         try {
             console.log(datos);
             const { data } = await clienteAxios.post(`${url}`, datos);
-            console.log(data);
-            // setErrores([]);
+            setRefresh(!refresh);
         } catch (error) {
             // setErrores(Object.values(error.response.data.errors));
             console.log(error.response.data.errors);
@@ -63,14 +63,11 @@ const DentalProvider = ({children}) => {
             showCancelButton: true,
             confirmButtonText: 'Save',
             denyButtonText: `Don't save`,
-        }).then((result) => {
+        }).then(async (result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
-                if (url == 'cliente') {
-                    db.updateClienteById(id,usr);
-                } else if(url == 'paciente'){
-                    pdb.updatePacienteById(id,usr);
-                }
+                const { data } = await clienteAxios.put(`${url}/${id}`, usr);
+                setRefresh(!refresh);
                 Swal.fire('Cambios Guardados!', '', 'success')
                 toast.info(`Datos actualizado correctamente`);
                 handleClickModal();
