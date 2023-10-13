@@ -8,8 +8,10 @@ export const useAuth = ({ middleware, url }) => {
 
     const login = async (datos) => {
         try {
+            console.log(datos);
             const { data } = await clienteAxios.post('api/login', datos);
-            console.log(data);
+            // const { data } = await clienteAxios.post('api/login', datos);
+            // console.log(data);
             // setErrores([]);
             // await mutate()
         } catch (error) {

@@ -32,7 +32,7 @@ export default function Sidebar() {
         <img src="../img/odontomixSinFondo.png" alt="Logotipo menu" />
       </Link>
       <ul>
-        <li>
+        <li className='mb-2'>
           <button onClick={() => handleMenuClick('crear')} className={`flex flex-1 items-center w-full text-left py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white ${isPathActive('/vista') ? 'bg-cyan-600' : (activeMenu === 'crear' ? 'bg-cyan-600' : '')}`}>Clientes-Pacientes {activeMenu === 'crear' ? <AiOutlineCaretUp className='ml-9' /> : <AiOutlineCaretDown className='ml-9' />}</button>
         
           {(activeMenu === 'crear'  && (
@@ -42,8 +42,8 @@ export default function Sidebar() {
             </ul>
           ))}
         </li>
-        <li><Link onClick={() => handleMenuClick('acerca')} to="/" className={`block py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white ${activeMenu == 'acerca' ? 'bg-cyan-600' : ''}`}>Acerca de</Link></li>
-        <li>
+        <li className='mb-2'><Link onClick={() => handleMenuClick('acerca')} to="/" className={`block py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white ${activeMenu == 'acerca' ? 'bg-cyan-600' : ''}`}>Acerca de</Link></li>
+        <li className='mb-2'>
           <button className="block w-full text-left py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white">Servicios</button>
         </li>
         <li><Link to="#" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white">Contacto</Link></li>

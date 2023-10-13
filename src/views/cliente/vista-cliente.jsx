@@ -2,22 +2,33 @@ import DatabaseSimulator from "../../data/DatabaseSimulator";
 import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa'; // Importando íconos de Font Awesome
 import useDental from "../../hooks/useDental";
-
+import clienteAxios from "../../config/axios";
+import useSWR from 'swr'
+import Spinner from "../../components/Spinner";
 
 export default function Vistacliente() {
 
-    const { handleClickModal, handleGetDatos, handleDatosActual, handleTipoModal, handleEliminarDatos, refresh } = useDental();
+    const { handleClickModal, handleGetDatos, handleDatosActual, handleTipoModal, handleEliminarDatos,  } = useDental();
     const [clientes, setClientes] = useState([]);
     const [error, setError] = useState([]);
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await handleGetDatos('api/clientes');
-            setClientes(data);
-        };
-        fetchData();
-        handleTipoModal('cliente');
-    }, [refresh]);
+    // useEffect(() => {
+        
+    // }, []);
+
     
+    const fetcher = () => clienteAxios('/api/clientes').then(datos => datos.data)
+    const { data, isLoading } = useSWR('/api/clientes', fetcher, {
+        refreshInterval: 500
+    })
+
+    useEffect(() => {
+        handleTipoModal('cliente');
+        if (data && data.data) {
+            setClientes(data.data);
+        }
+    }, [data]);
+    
+    if (isLoading) return <Spinner />
 
     return (
         <div className="min-w-full overflow-hidden rounded-lg shadow p-4">
@@ -66,7 +77,7 @@ export default function Vistacliente() {
                     ) : (  
 
                     clientes.map(cliente => (
-                    <tr key={cliente.identificacion_cliente}>
+                    <tr key={cliente.idcliente}>
                         <td className="px-5 py-5 border-b border-gray-200 bg-white text-base font-serif text-center">
                             {cliente.nombre_cliente} {cliente.apellidos_cliente}
                         </td>

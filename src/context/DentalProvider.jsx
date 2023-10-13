@@ -28,7 +28,6 @@ const DentalProvider = ({children}) => {
 
 
     const handleDatosActual = (cliente) => {
-        console.log(cliente);
         setDatosActual(cliente);
         handleClickModal();
     }

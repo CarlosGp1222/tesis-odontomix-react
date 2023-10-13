@@ -3,7 +3,7 @@ import { useAuth } from "../hooks/useAuth";
 
 export default function Login() {
   const nombre_usuario = createRef();
-  const password = createRef();
+  const clave_usuario = createRef();
 
   const { login } = useAuth({
     middleware: 'guest',
@@ -16,7 +16,7 @@ export default function Login() {
 
     const datos = {
       nombre_usuario: nombre_usuario.current.value,
-      password: password.current.value,
+      password: clave_usuario.current.value,
     }
     login(datos);
   }
@@ -48,15 +48,15 @@ export default function Login() {
           <div className="mb-4">
             <label
               className="text-slate-800"
-              htmlFor="password"
+              htmlFor="clave_usuario"
             >
               Contraseña
             </label>
             <input 
               type="password" 
-              ref={password}
-              id="password"
-              name="password"
+              ref={clave_usuario}
+              id="clave_usuario"
+              name="clave_usuario"
               className="w-full p-3 mt-2 bg-gray-200 rounded-md"
               placeholder="Ingresa tu clave de usuario"
             />
