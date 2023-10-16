@@ -1,4 +1,4 @@
-import {createContext, useState} from 'react'
+import {createContext, useEffect, useState} from 'react'
 import DatabaseSimulator from '../data/DatabaseSimulator';
 import PacientesDatabaseSimulator from '../data/PacientesDatabaseSimulator';
 import Swal from 'sweetalert2';
@@ -6,13 +6,13 @@ import { toast } from 'react-toastify';
 import clienteAxios from '../config/axios';
 
 const DentalContext = createContext();
-const db = new DatabaseSimulator();
-const pdb = new PacientesDatabaseSimulator();
+// const db = new DatabaseSimulator();
+// const pdb = new PacientesDatabaseSimulator();
 const DentalProvider = ({children}) => {
     
     const [modal, setModal] = useState(false);
     const [datosActual, setDatosActual] = useState({});
-    const [datos, setDatos] = useState({});
+    const [datosId, setDatosId] = useState({});
     const [tipoModal, setTipoModal] = useState(false);
     const [refresh, setRefresh] = useState(false);
     const handleClickModal = () => {
@@ -21,6 +21,16 @@ const DentalProvider = ({children}) => {
         }
         setModal(!modal);
     }
+    const getDatos = async () => {
+        const {data} = await clienteAxios.get(`api/identificacion`);
+        console.log(data.data);
+        setDatosId(data.data);
+    }
+
+    useEffect(() => {
+        //obtner datos de la base de datos http://localhost:8000/api/identificacion
+        getDatos();
+    }, [])
 
     const handleTipoModal = (tipo) => {
         setTipoModal(tipo);
@@ -130,7 +140,8 @@ const DentalProvider = ({children}) => {
                 handleTipoModal,
                 tipoModal,
                 handleEliminarDatos,
-                refresh
+                refresh,
+                datosId
             }}
         >
             {children}

@@ -1,10 +1,12 @@
-import { createRef, useEffect } from "react"
+import { createRef, useEffect, useState } from "react"
 import { useAuth } from "../hooks/useAuth";
+import Alerta from "../components/Alertas";
 
 export default function Login() {
   const nombre_usuario = createRef();
   const clave_usuario = createRef();
 
+  const [errores, setErrores] = useState([]);
   const { login } = useAuth({
     middleware: 'guest',
     url: '/'
@@ -18,7 +20,7 @@ export default function Login() {
       nombre_usuario: nombre_usuario.current.value,
       password: clave_usuario.current.value,
     }
-    login(datos);
+    login(datos, setErrores);
   }
 
   return (
@@ -28,6 +30,9 @@ export default function Login() {
 
       <div className="bg-white drop-shadow-2xl rounded-md px-5 py-10">
         <form onSubmit={handleSubmit}>
+          {
+            errores ? errores.map((error, i) => <Alerta key={i}>{error}</Alerta>) : null
+          }
           <div className="mb-4">
             <label
               className="text-slate-800"
@@ -36,8 +41,8 @@ export default function Login() {
             >
               Usuario
             </label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               ref={nombre_usuario}
               id="nombre_usuario"
               name="nombre_usuario"
@@ -52,8 +57,8 @@ export default function Login() {
             >
               Contraseña
             </label>
-            <input 
-              type="password" 
+            <input
+              type="password"
               ref={clave_usuario}
               id="clave_usuario"
               name="clave_usuario"
@@ -61,7 +66,7 @@ export default function Login() {
               placeholder="Ingresa tu clave de usuario"
             />
           </div>
-          <button  
+          <button
             className="bg-indigo-900 hover:bg-indigo-950 text-white w-full mt-5 p-3 rounded-md uppercase font-bold cursor-pointer"
           >
             Iniciar sesión

@@ -6,6 +6,7 @@ import Inicio from './views/Inicio';
 import Login from './views/Login';
 import Vistacliente from './views/cliente/vista-cliente';
 import VistaPaciente from './views/paciente/vista-paciente';
+import VistaCitas from './views/citas/vista-citas';
 
 const router = createBrowserRouter([
     {
@@ -41,6 +42,17 @@ const router = createBrowserRouter([
             {
                 path: '/paciente/vista-paciente',
                 element: <VistaPaciente />,
+            },
+        ],
+    },
+    // Citas
+    {
+        path: '/citas',
+        element: <Layout />,
+        children: [
+            {
+                path: '/citas/vista-citas',
+                element: <VistaCitas />,
             },
         ],
     },
