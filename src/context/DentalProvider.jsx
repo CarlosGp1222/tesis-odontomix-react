@@ -45,7 +45,7 @@ const DentalProvider = ({ children }) => {
         const { data: data5 } = await clienteAxios.get(`api/examen_labios`);
         setExamenLabios(data5.data);
         const { data: data6 } = await clienteAxios.get(`api/señas_particulares`);
-        setExamenSeñas(data6.data);        
+        setExamenSeñas(data6.data);
     }
 
     useEffect(() => {
@@ -80,9 +80,20 @@ const DentalProvider = ({ children }) => {
         }
     }
 
-    const handleSubmitHistorial = async (datos, url) => {
+    const handleSubmitHistorial = async (arrayEnfermedades, Preguntas, Examenes, idPaciente, idConsulta) => {
         try {
-            
+            for (let index = 0; index < arrayEnfermedades.length; index++) {   
+                const datosEnfermedad = {
+                    idenfermedadpaciente: idConsulta,
+                    idpaciente: arrayEnfermedades[index].idpaciente,
+                    idenfermedad: arrayEnfermedades[index].idenfermedad,
+                    tratamiento_enfermedad: arrayEnfermedades[index].tratamiento_enfermedad,
+                }                             
+                // const { data:datosEnfermedadP } = await clienteAxios.post(`api/enfermedad_paciente`,  datosEnfermedad);                
+            }
+            console.log(Preguntas);
+            // const { data:datosPreguntas } = await clienteAxios.post(`api/enfermedad_paciente`,  Preguntas);                
+
         } catch (error) {
             // setErrores(Object.values(error.response.data.errors));
             console.log(error.response.data.errors);
@@ -104,7 +115,7 @@ const DentalProvider = ({ children }) => {
 
         try {
             Swal.fire({
-                title:`Desea completar la cita?`,
+                title: `Desea completar la cita?`,
                 showDenyButton: true,
                 showCancelButton: true,
                 confirmButtonText: 'Save',
@@ -119,7 +130,7 @@ const DentalProvider = ({ children }) => {
                         //fecha actual en formato yyyy-mm-dd con hora 00:00:00
                         fecha_consulta: new Date().toISOString().slice(0, 10) + ' ' + '00:00:00',
                     }
-                    const { data: dataCita } = await clienteAxios.post(`api/consultas`,datos);
+                    const { data: dataCita } = await clienteAxios.post(`api/consultas`, datos);
                     console.log(dataCita);
                     setRefresh(!refresh);
                     Swal.fire('Cita actualizada correctamente!', '', 'success')
@@ -272,7 +283,7 @@ const DentalProvider = ({ children }) => {
                 examenGanglios,
                 examenLabios,
                 examenSeñas,
-                
+                handleSubmitHistorial
             }}
         >
             {children}

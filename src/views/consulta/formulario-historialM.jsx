@@ -16,7 +16,7 @@ export default function FormularioHistorialM() {
     const preguntaMedicamentos = createRef();
     const preguntaAlergias = createRef();
 
-    const { examenCabeza, examenCara, examenATM, examenGanglios, examenLabios, examenSeñas } = useDental();
+    const { examenCabeza, examenCara, examenATM, examenGanglios, examenLabios, examenSeñas, handleSubmitHistorial } = useDental();
 
     const idconsulta = localStorage.getItem('IDCONSULTA');
     const [selectedDiseases, setSelectedDiseases] = useState([]);
@@ -42,10 +42,6 @@ export default function FormularioHistorialM() {
         }));
     };
 
-    const handleDiseaseDetailChange = (disease, detail) => {
-        setDiseaseDetails({ ...diseaseDetails, [disease]: detail });
-    };
-
     const fetcher = () => clienteAxios(`api/consultas/${idconsulta}`).then(datos => datos.data);
     const { data: datosConsultas, isLoading } = useSWR(`api/consultas/${idconsulta}`, fetcher, {
         refreshInterval: 3000
@@ -56,7 +52,19 @@ export default function FormularioHistorialM() {
         refreshInterval: 3000
     });
 
+    console.log(step);
     const nextStep = () => {
+        console.log("condicion enfermedades ", !isAllDiseasesFilled());
+        console.log("condicion complicaciones ", complications);
+        console.log("condicion preguntaTratamiento ", beingTreated);
+        console.log("condicion preguntaMedicamentos ", takingMedication);
+        console.log("condicion preguntaAlergias ", allergic);
+        console.log("valor complicaciones ", preguntaComplicaciones?.current?.value?.trim());
+        console.log("valor preguntaTratamiento ",preguntaTratamiento?.current?.value?.trim());
+        console.log("valor preguntaMedicamentos ", preguntaMedicamentos?.current?.value?.trim());
+        console.log("valor preguntaAlergias ",preguntaAlergias?.current?.value?.trim());
+
+
         if (!isAllDiseasesFilled()) {
             alert("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
             return;
@@ -77,19 +85,28 @@ export default function FormularioHistorialM() {
     };
 
     const prevStep = () => {
+        console.log("condicion enfermedades", !isAllDiseasesFilled());
+        console.log("condicion complicaciones", complications);
+        console.log("condicion preguntaTratamiento", beingTreated);  
+        console.log("condicion preguntaMedicamentos", takingMedication);  
+        console.log("condicion preguntaAlergias", allergic);
         if (!isAllDiseasesFilled()) {
             alert("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
             return;
         }
+        
         if (complications && !preguntaComplicaciones?.current?.value?.trim()) {
             return;
         }
+            
         if (beingTreated && !preguntaTratamiento?.current?.value?.trim()) {
             return;
         }
+        
         if (takingMedication && !preguntaMedicamentos?.current?.value?.trim()) {
             return;
         }
+        
         if (allergic && !preguntaAlergias?.current?.value?.trim()) {
             return;
         }
@@ -316,19 +333,6 @@ export default function FormularioHistorialM() {
         )
     };
 
-    const DiseaseInput = ({ id, value, onChange, placeholder }) => {
-        return (
-            <input
-                required
-                type="text"
-                placeholder={placeholder}
-                value={value}
-                onChange={(e) => onChange(id, e.target.value)}
-                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-        );
-    };
-
     const StepFour = () => (
         <div>
             <section className="mb-8 p-6 bg-white shadow rounded">
@@ -426,11 +430,14 @@ export default function FormularioHistorialM() {
     );
 
     const getDiseasesData = () => {
+        // console.log(consulta);
         return Object.entries(selectedDiseases)
             .filter(([_, diseaseData]) => diseaseData.selected && diseaseData.text)
             .map(([diseaseId, diseaseData]) => {
                 return {
-                    idcliente: consulta.cita.paciente.idpaciente,
+                    idconsulta: consulta.idconsulta,
+                    idcliente: consulta.cita.cliente.idcliente,
+                    idpaciente: consulta.cita.paciente.idpaciente,
                     idenfermedad: diseaseId,
                     tratamiento_enfermedad: diseaseData.text.trim(), // Asegurarse de que no hay espacios en blanco
                 };
@@ -440,12 +447,18 @@ export default function FormularioHistorialM() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
+
+
         // Obtiene los datos de las enfermedades
         const diseasesData = getDiseasesData();
-        for (let index = 0; index < diseasesData.length; index++) {
-            const element = diseasesData[index];
-            console.log(element);
-        }
+        // const preguntas = {
+        //     preguntaComplicaciones: preguntaComplicaciones?.current?.value?.trim(),
+        //     preguntaTratamiento: preguntaTratamiento?.current?.value?.trim(),
+        //     preguntaMedicamentos: preguntaMedicamentos?.current?.value?.trim(),
+        //     preguntaAlergias: preguntaAlergias?.current?.value?.trim(),
+        // }
+        // console.log(preguntaAlergias);
+        handleSubmitHistorial(diseasesData, "", "", consulta.cita.paciente.idpaciente, consulta.idconsulta);
         // console.log(diseasesData);
         // Aquí tienes los datos para enviar
 
