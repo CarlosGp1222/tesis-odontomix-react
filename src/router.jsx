@@ -7,6 +7,8 @@ import Login from './views/Login';
 import Vistacliente from './views/cliente/vista-cliente';
 import VistaPaciente from './views/paciente/vista-paciente';
 import VistaCitas from './views/citas/vista-citas';
+import VistaConsultas from './views/consulta/vista-consultas';
+import FormularioHistorialM from './views/consulta/formulario-historialM';
 
 const router = createBrowserRouter([
     {
@@ -51,7 +53,7 @@ const router = createBrowserRouter([
         element: <Layout />,
         children: [
             {
-                path: '/citas/vista-citas',
+                path: '/citas/lista-citas',
                 element: <VistaCitas />,
             },
         ],
@@ -66,7 +68,22 @@ const router = createBrowserRouter([
                 element: <Login />,
             }
         ]
-    }
+    },
+    // Consultas
+    {
+        path: '/consultas',
+        element: <Layout />,
+        children: [
+            {
+                path: '/consultas/lista-consultas',
+                element: <VistaConsultas />,
+            },
+            {
+                path: '/consultas/historial-medico',
+                element: <FormularioHistorialM />,
+            },
+        ],
+    },
 ]);
 
 export default router;

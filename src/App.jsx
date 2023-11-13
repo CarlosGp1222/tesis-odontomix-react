@@ -1,11 +1,8 @@
+import { RouterProvider } from 'react-router-dom';
+import router from './router'; // Asegúrate de que la ruta es correcta
 
-function App() {  
-
+function App() {
   return (
-    <>
-      <h1 className='text-6xl text-red-500'>Hola</h1>
-    </>
-  )
+    <RouterProvider router={router} />
+  );
 }
-
-export default App

@@ -7,6 +7,7 @@ import ClienteModal from "../components/ClienteModal";
 import "react-toastify/dist/ReactToastify.css";
 import 'sweetalert2/src/sweetalert2.scss'
 import PacienteModal from "../components/PacienteModal";
+import CitasModal from "../components/CitasModal";
 const customStyles = {
   content: {
     top: '50%',
@@ -27,15 +28,17 @@ export default function Layout() {
     <>
       <div className="min-h-screen flex">
         <Sidebar />
-        <div className="flex-1 bg-gray-200">
+        <div className="flex-1 bg-gray-200 overflow-y-auto max-h-screen">
           <Outlet />
         </div>
       </div>
       <Modal isOpen={modal} style={customStyles} >
         {tipoModal == 'cliente' ? <ClienteModal /> : null}
         {tipoModal == 'paciente' ? <PacienteModal /> : null}
+        {tipoModal == 'citas' ? <CitasModal /> : null}
       </Modal>
       <ToastContainer />
     </>
   )
 }
+

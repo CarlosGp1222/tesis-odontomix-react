@@ -93,7 +93,7 @@ export default function VistaPaciente() {
                     <button onClick={(event) => handleDatosActual(paciente)} className="text-blue-500 hover:text-blue-700 mr-4">
                       <FaEdit />
                     </button>
-                    <button onClick={(event) => handleEliminarDatos(paciente.id_paciente, 'paciente')} className="text-red-500 hover:text-red-700">
+                    <button onClick={(event) => handleEliminarDatos(paciente.idpaciente, 'api/pacientes')} className="text-red-500 hover:text-red-700">
                       <FaTrash />
                     </button>
                   </td>

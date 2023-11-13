@@ -30,7 +30,8 @@ export const useAuth = ({ middleware, url }) => {
                 navigate('/', { replace: true });
             }
         } catch (error) {
-            console.log(error.response.data.message);
+            console.log(error);
+            // console.log(error.response.data.message);
             let mensajesError = [];
 
             if (typeof error.response.data.message === 'string') {

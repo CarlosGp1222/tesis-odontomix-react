@@ -3,6 +3,7 @@ import useDental from "../hooks/useDental";
 import { createRef, useState } from "react";
 import { toast } from "react-toastify";
 import Swal from 'sweetalert2';
+
 export default function PacienteModal() {
     const ididentificacion = createRef();
     const nombre_paciente = createRef();
@@ -21,10 +22,11 @@ export default function PacienteModal() {
     const { handleClickModal, handleIngresarDatos, datosActual, handleEditarDatos, datosId } = useDental();
 
     const handleEnviarPaciente = e => {
-        if (!validateFields()) {
-            return; // No continuar si hay campos inválidos
-        }
         e.preventDefault();
+        if (!validarCampos()) {
+            return;
+        }
+
         const datos = {
             nombre_paciente: nombre_paciente.current.value,
             apellidos_paciente: apellidos_paciente.current.value,
@@ -42,14 +44,12 @@ export default function PacienteModal() {
             handleEditarDatos(datosActual.idpaciente, datos, 'api/pacientes');
         } else {
             handleIngresarDatos(datos, 'api/pacientes');
-            toast.info(`Paciente ${datos.nombre_paciente + " " + datos.apellidos_paciente} creado correctamente`);
         }
     }
 
-    const validateFields = () => {
-        handleValidaIdentificacion();
+    const validarCampos = () => {
         let newInvalidFields = {};
-        
+
         const fieldsToValidate = [
             { ref: nombre_paciente, name: 'nombre_paciente' },
             { ref: apellidos_paciente, name: 'apellidos_paciente' },
@@ -63,7 +63,7 @@ export default function PacienteModal() {
         ];
 
         fieldsToValidate.forEach(field => {
-            if (!field.ref.current.value) {
+            if (!field.ref.current.value.trim()) { // Verificar si el campo está vacío
                 newInvalidFields[field.name] = true;
             }
         });
@@ -94,8 +94,8 @@ export default function PacienteModal() {
                     }
                     break;
                 case '3':
-                    if (identificacion_paciente.current.value.length > 9) {
-                        setErrorMsg('El pasaporte no debe tener más de 9 caracteres.');
+                    if (identificacion_paciente.current.value.length !== 9) {
+                        setErrorMsg('El pasaporte no debe tener más ni menos de 9 caracteres.');
                         setValidate(false);
                     } else {
                         setErrorMsg('');
@@ -108,7 +108,7 @@ export default function PacienteModal() {
                     break;
             }
         } else {
-            // setErrorMsg('El campo no puede estar vacío.');
+            setErrorMsg('El campo no puede estar vacío.');
             setValidate(false);
         }
     }
@@ -122,77 +122,64 @@ export default function PacienteModal() {
             </div>
             <h2 className="text-center mb-4 text-xl font-bold">{datosActual.idpaciente ? 'Actualizar Paciente' : 'Crear Paciente'}</h2>
             <form noValidate onSubmit={handleEnviarPaciente} className="bg-white p-4 rounded grid grid-cols-2 gap-4">
-                {/* si exite datosActual esconder el div del input identficacion */}
-
                 <div className={`${datosActual.idpaciente ? 'hidden' : ''}`}>
                     <label className="block text-gray-700 text-sm font-bold mb-2">Identificación:</label>
                     <select onChange={handleValidaIdentificacion} defaultValue={datosActual ? datosActual.ididentificacion : ''} ref={ididentificacion} name="ididentificacion" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                    {datosId.map(datoId => (
-                        <option key={datoId.ididentificacion} value={datoId.ididentificacion}>{datoId.nombre_identificacion}</option>
-                    ))}
+                        {datosId.map(datoId => (
+                            <option key={datoId.ididentificacion} value={datoId.ididentificacion}>{datoId.nombre_identificacion}</option>
+                        ))}
                     </select>
                 </div>
                 <div>
                     <label className="block text-gray-700 text-sm font-bold mb-2">Nombres:</label>
-                    <input 
-                        onChange={() => validateFields()} 
-                        defaultValue={datosActual ? datosActual.nombre_paciente : ''} 
-                        ref={nombre_paciente} 
-                        type="text" name="nombre_paciente" 
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                    <input
+                        defaultValue={datosActual ? datosActual.nombre_paciente : ''}
+                        ref={nombre_paciente}
+                        type="text" name="nombre_paciente"
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${invalidFields.nombre_paciente ? 'border-red-500' : ''}`}
                     />
-                    {invalidFields.nombre_paciente && <p className="text-red-500 text-xs mt-1">Este campo es obligatorio</p>}
                 </div>
                 <div>
                     <label className="block text-gray-700 text-sm font-bold mb-2">Apellidos:</label>
-                    <input 
-                        onChange={() => validateFields()}
-                        defaultValue={datosActual ? datosActual.apellidos_paciente : ''} 
-                        ref={apellidos_paciente} 
-                        type="text" 
-                        name="apellidos_paciente" 
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                    <input
+                        defaultValue={datosActual ? datosActual.apellidos_paciente : ''}
+                        ref={apellidos_paciente}
+                        type="text"
+                        name="apellidos_paciente"
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${invalidFields.apellidos_paciente ? 'border-red-500' : ''}`}
                     />
-                    {invalidFields.apellidos_paciente && <p className="text-red-500 text-xs mt-1">Este campo es obligatorio</p>}
                 </div>
-                <div
-                    className={`${datosActual.idpaciente ? 'hidden' : ''}`}
-                >
+                <div className={`${datosActual.idpaciente ? 'hidden' : ''}`}>
                     <label className="block text-gray-700 text-sm font-bold mb-2">Identificación paciente:</label>
-                    <input 
-                        onChange={() => validateFields()} 
-                        defaultValue={datosActual ? datosActual.identificacion_paciente : ''} 
-                        ref={identificacion_paciente} 
-                        type="text" 
-                        name="identificacion_paciente" 
-                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outlin ${validate ? '' : 'border-red-500'}`} 
+                    <input
+                        defaultValue={datosActual ? datosActual.identificacion_paciente : ''}
+                        ref={identificacion_paciente}
+                        type="text"
+                        name="identificacion_paciente"
+                        onBlur={handleValidaIdentificacion} // Aquí se añade el evento onBlur
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${invalidFields.identificacion_paciente ? 'border-red-500' : ''}`}
                     />
-                    {invalidFields.identificacion_paciente && <p className="text-red-500 text-xs mt-1">Este campo es obligatorio</p>}
                     {!validate && <p className="text-red-500 text-xs mt-1">{errorMsg}</p>}
                 </div>
                 <div>
                     <label className="block text-gray-700 text-sm font-bold mb-2">Altura (Metros):</label>
-                    <input 
-                        onChange={() => validateFields()}
-                        defaultValue={datosActual ? datosActual.altura_paciente : ''} 
-                        ref={altura_paciente} 
-                        type="number" 
-                        name="altura_paciente" 
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                    <input
+                        defaultValue={datosActual ? datosActual.altura_paciente : ''}
+                        ref={altura_paciente}
+                        type="number"
+                        name="altura_paciente"
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${invalidFields.altura_paciente ? 'border-red-500' : ''}`}
                     />
-                    {invalidFields.altura_paciente && <p className="text-red-500 text-xs mt-1">Este campo es obligatorio</p>}
                 </div>
                 <div>
                     <label className="block text-gray-700 text-sm font-bold mb-2">Peso (Kilos):</label>
-                    <input 
-                        onChange={() => validateFields()}
-                        defaultValue={datosActual ? datosActual.peso_paciente : ''} 
-                        ref={peso_paciente} 
-                        type="number" 
-                        name="peso_paciente" 
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                    <input
+                        defaultValue={datosActual ? datosActual.peso_paciente : ''}
+                        ref={peso_paciente}
+                        type="number"
+                        name="peso_paciente"
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${invalidFields.peso_paciente ? 'border-red-500' : ''}`}
                     />
-                    {invalidFields.peso_paciente && <p className="text-red-500 text-xs mt-1">Este campo es obligatorio</p>}
                 </div>
                 <div>
                     <label className="block text-gray-700 text-sm font-bold mb-2">Género:</label>
@@ -203,51 +190,43 @@ export default function PacienteModal() {
                 </div>
                 <div>
                     <label className="block text-gray-700 text-sm font-bold mb-2">Edad:</label>
-                    <input 
-                        onChange={() => validateFields()}
-                        defaultValue={datosActual ? datosActual.edad_paciente : ''} 
-                        ref={edad_paciente} 
-                        type="number" 
-                        name="edad_paciente" 
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                    <input
+                        defaultValue={datosActual ? datosActual.edad_paciente : ''}
+                        ref={edad_paciente}
+                        type="number"
+                        name="edad_paciente"
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${invalidFields.edad_paciente ? 'border-red-500' : ''}`}
                     />
-                    {invalidFields.edad_paciente && <p className="text-red-500 text-xs mt-1">Este campo es obligatorio</p>}
                 </div>
                 <div>
                     <label className="block text-gray-700 text-sm font-bold mb-2">Dirección:</label>
-                    <input 
-                    onChange={() => validateFields()}
-                    defaultValue={datosActual ? datosActual.direccion_paciente : ''} 
-                    ref={direccion_paciente} 
-                    type="text" 
-                    name="direccion_paciente" 
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                />
-                {invalidFields.direccion_paciente && <p className="text-red-500 text-xs mt-1">Este campo es obligatorio</p>}
+                    <input
+                        defaultValue={datosActual ? datosActual.direccion_paciente : ''}
+                        ref={direccion_paciente}
+                        type="text"
+                        name="direccion_paciente"
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${invalidFields.direccion_paciente ? 'border-red-500' : ''}`}
+                    />
                 </div>
                 <div>
                     <label className="block text-gray-700 text-sm font-bold mb-2">Teléfono:</label>
-                    <input 
-                        onChange={() => validateFields()}
-                        defaultValue={datosActual ? datosActual.telefono_paciente : ''} 
-                        ref={telefono_paciente} 
-                        type="text" 
-                        name="telefono_paciente" 
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                    <input
+                        defaultValue={datosActual ? datosActual.telefono_paciente : ''}
+                        ref={telefono_paciente}
+                        type="text"
+                        name="telefono_paciente"
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${invalidFields.telefono_paciente ? 'border-red-500' : ''}`}
                     />
-                    {invalidFields.telefono_paciente && <p className="text-red-500 text-xs mt-1">Este campo es obligatorio</p>}
                 </div>
                 <div className={`${datosActual.id}`}>
                     <label className="block text-gray-700 text-sm font-bold mb-2">Correo:</label>
-                    <input 
-                        onChange={() => validateFields()}
-                        defaultValue={datosActual ? datosActual.correo_paciente : ''} 
-                        ref={correo_paciente} 
-                        type="email" 
-                        name="correo_paciente" 
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                    <input
+                        defaultValue={datosActual ? datosActual.correo_paciente : ''}
+                        ref={correo_paciente}
+                        type="email"
+                        name="correo_paciente"
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${invalidFields.correo_paciente ? 'border-red-500' : ''}`}
                     />
-                    {invalidFields.correo_paciente && <p className="text-red-500 text-xs mt-1">Este campo es obligatorio</p>}
                 </div>
                 <div className="col-span-2 flex justify-end">
                     <button type="submit" className="bg-slate-800 text-white px-6 py-2 rounded-full hover:bg-slate-900 focus:outline-none focus:bg-slate-900">
@@ -257,5 +236,6 @@ export default function PacienteModal() {
             </form>
         </div>
     )
+
 
 }

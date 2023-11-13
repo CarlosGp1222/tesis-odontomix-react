@@ -10,6 +10,7 @@ export default function Vistacliente() {
 
     const { handleClickModal, handleGetDatos, handleDatosActual, handleTipoModal, handleEliminarDatos  } = useDental();
     const [clientes, setClientes] = useState([]);
+    
     // useEffect(() => {
         
     // }, []);
@@ -100,7 +101,7 @@ export default function Vistacliente() {
                             <button onClick={(event) => handleDatosActual(cliente)} className="text-blue-500 hover:text-blue-700 mr-4">
                                 <FaEdit />
                             </button>
-                            <button onClick={(event) => handleEliminarDatos(cliente.id_cliente, 'cliente')} className="text-red-500 hover:text-red-700">
+                            <button onClick={(event) => handleEliminarDatos(cliente.idcliente, 'api/clientes')} className="text-red-500 hover:text-red-700">
                                 <FaTrash />
                             </button>
                         </td>
