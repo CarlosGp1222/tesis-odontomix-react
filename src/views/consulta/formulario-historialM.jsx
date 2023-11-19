@@ -1,4 +1,4 @@
-import { createRef, useCallback, useState } from 'react'
+import { createRef, useCallback, useEffect, useState } from 'react'
 import clienteAxios from '../../config/axios';
 import useSWR from 'swr';
 import Spinner from '../../components/Spinner';
@@ -15,6 +15,21 @@ export default function FormularioHistorialM() {
     const preguntaTratamiento = createRef();
     const preguntaMedicamentos = createRef();
     const preguntaAlergias = createRef();
+    const [inputCompliaciones, setInputComplicaciones] = useState('');
+    const [inputTratamineto, setInputTratamiento] = useState('');
+    const [inputMedicamentos, setInputMedicamentos] = useState('');
+    const [inputAlergias, setInputAlergias] = useState('');
+    const [inputExamenCabeza, setInputExamenCabeza] = useState('');
+    const [inputValues, setInputValues] = useState({
+        idexamen_cabeza: '',
+        idexamen_cara: '',
+        idexamen_atm: '',
+        idexamen_ganglios: '',
+        idexamen_labios: '',
+        idexamen_señasp: ''
+    });
+
+    // Función para manejar los cambios de los inputs
 
     const { examenCabeza, examenCara, examenATM, examenGanglios, examenLabios, examenSeñas, handleSubmitHistorial } = useDental();
 
@@ -44,71 +59,85 @@ export default function FormularioHistorialM() {
 
     const fetcher = () => clienteAxios(`api/consultas/${idconsulta}`).then(datos => datos.data);
     const { data: datosConsultas, isLoading } = useSWR(`api/consultas/${idconsulta}`, fetcher, {
-        refreshInterval: 3000
+        refreshInterval: 15000
     });
 
     const fetcherEnfermedades = () => clienteAxios(`api/enfermedades`).then(datos => datos.data);
     const { data: datosEnfermedades, isLoading: loadingEnfermedades } = useSWR(`api/enfermedades`, fetcherEnfermedades, {
-        refreshInterval: 3000
+        refreshInterval: 15000
     });
 
-    console.log(step);
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setInputValues({
+            ...inputValues,
+            [name]: value
+        });
+    };
+
+    useEffect(() => {
+        handleInputChange
+    }, [inputValues]);
+
+    // console.log(step);
     const nextStep = () => {
-        console.log("condicion enfermedades ", !isAllDiseasesFilled());
-        console.log("condicion complicaciones ", complications);
-        console.log("condicion preguntaTratamiento ", beingTreated);
-        console.log("condicion preguntaMedicamentos ", takingMedication);
-        console.log("condicion preguntaAlergias ", allergic);
-        console.log("valor complicaciones ", preguntaComplicaciones?.current?.value?.trim());
-        console.log("valor preguntaTratamiento ",preguntaTratamiento?.current?.value?.trim());
-        console.log("valor preguntaMedicamentos ", preguntaMedicamentos?.current?.value?.trim());
-        console.log("valor preguntaAlergias ",preguntaAlergias?.current?.value?.trim());
 
-
-        if (!isAllDiseasesFilled()) {
-            alert("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
-            return;
-        }
-        if (complications && !preguntaComplicaciones?.current?.value?.trim()) {
-            return;
-        }
-        if (beingTreated && !preguntaTratamiento?.current?.value?.trim()) {
-            return;
-        }
-        if (takingMedication && !preguntaMedicamentos?.current?.value?.trim()) {
-            return;
-        }
-        if (allergic && !preguntaAlergias?.current?.value?.trim()) {
-            return;
+        if (step == 2) {
+            if (!isAllDiseasesFilled()) {
+                alert("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
+                return;
+            }
+            if (complications && !preguntaComplicaciones?.current?.value?.trim()) {
+                return;
+            } else {
+                setInputComplicaciones(preguntaComplicaciones?.current?.value?.trim());
+            }
+            if (beingTreated && !preguntaTratamiento?.current?.value?.trim()) {
+                return;
+            } else {
+                setInputTratamiento(preguntaTratamiento?.current?.value?.trim());
+            }
+            if (takingMedication && !preguntaMedicamentos?.current?.value?.trim()) {
+                return;
+            } else {
+                setInputMedicamentos(preguntaMedicamentos?.current?.value?.trim());
+            }
+            if (allergic && !preguntaAlergias?.current?.value?.trim()) {
+                return;
+            } else {
+                setInputAlergias(preguntaAlergias?.current?.value?.trim());
+            }
         }
         setStep(step + 1);
     };
 
     const prevStep = () => {
-        console.log("condicion enfermedades", !isAllDiseasesFilled());
-        console.log("condicion complicaciones", complications);
-        console.log("condicion preguntaTratamiento", beingTreated);  
-        console.log("condicion preguntaMedicamentos", takingMedication);  
-        console.log("condicion preguntaAlergias", allergic);
-        if (!isAllDiseasesFilled()) {
-            alert("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
-            return;
-        }
-        
-        if (complications && !preguntaComplicaciones?.current?.value?.trim()) {
-            return;
-        }
-            
-        if (beingTreated && !preguntaTratamiento?.current?.value?.trim()) {
-            return;
-        }
-        
-        if (takingMedication && !preguntaMedicamentos?.current?.value?.trim()) {
-            return;
-        }
-        
-        if (allergic && !preguntaAlergias?.current?.value?.trim()) {
-            return;
+
+        if (step == 2) {
+            if (!isAllDiseasesFilled()) {
+                alert("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
+                return;
+            }
+            if (complications && !preguntaComplicaciones?.current?.value?.trim()) {
+                return;
+            } else {
+                setInputComplicaciones(preguntaComplicaciones?.current?.value?.trim());
+            }
+            if (beingTreated && !preguntaTratamiento?.current?.value?.trim()) {
+                return;
+            } else {
+                setInputTratamiento(preguntaTratamiento?.current?.value?.trim());
+            }
+            if (takingMedication && !preguntaMedicamentos?.current?.value?.trim()) {
+                return;
+            } else {
+                setInputMedicamentos(preguntaMedicamentos?.current?.value?.trim());
+            }
+            if (allergic && !preguntaAlergias?.current?.value?.trim()) {
+                return;
+            } else {
+                setInputAlergias(preguntaAlergias?.current?.value?.trim());
+            }
         }
         setStep(step - 1);
     };
@@ -218,8 +247,13 @@ export default function FormularioHistorialM() {
                     </div>
                     {complications && (
                         <div className="mb-4">
+
                             <label className="block text-gray-700 font-bold mb-2">¿Cuáles?</label>
-                            <input ref={preguntaComplicaciones} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
+                            <input
+                                defaultValue={inputCompliaciones}
+                                onBlur={(e) => setInputComplicaciones(e.target.value)}
+                                ref={preguntaComplicaciones} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required
+                            />
                         </div>
                     )}
                 </div>
@@ -234,7 +268,10 @@ export default function FormularioHistorialM() {
                     {beingTreated && (
                         <div className="mb-4">
                             <label className="block text-gray-700 font-bold mb-2">¿Para qué enfermedad?</label>
-                            <input ref={preguntaTratamiento} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
+                            <input
+                                defaultValue={inputTratamineto}
+                                onBlur={(e) => setInputTratamiento(e.target.value)}
+                                ref={preguntaTratamiento} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
                         </div>
                     )}
                 </div>
@@ -249,7 +286,10 @@ export default function FormularioHistorialM() {
                     {takingMedication && (
                         <div className="mb-4">
                             <label className="block text-gray-700 font-bold mb-2">¿Cuáles y con qué dosis?</label>
-                            <input ref={preguntaMedicamentos} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
+                            <input
+                                defaultValue={inputMedicamentos}
+                                onBlur={(e) => setInputMedicamentos(e.target.value)}
+                                ref={preguntaMedicamentos} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
                         </div>
                     )}
                 </div>
@@ -264,7 +304,10 @@ export default function FormularioHistorialM() {
                     {allergic && (
                         <div className="mb-4">
                             <label className="block text-gray-700 font-bold mb-2">¿Cuáles?</label>
-                            <input ref={preguntaAlergias} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
+                            <input
+                                defaultValue={inputAlergias}
+                                onBlur={(e) => setInputAlergias(e.target.value)}
+                                ref={preguntaAlergias} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
                         </div>
                     )}
                 </div>
@@ -343,7 +386,8 @@ export default function FormularioHistorialM() {
                     <div>
                         <div className="mb-3">
                             <label className="block text-gray-700 text-sm font-bold mb-2">Cabeza:</label>
-                            <select name="ididentificacion" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <select required defaultValue={inputValues.idexamen_cabeza} onChange={handleInputChange} name="idexamen_cabeza" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <option value="">--Selecciona--</option>
                                 {examenCabeza.map(examenCabez => (
                                     <option key={examenCabez.idcabeza} value={examenCabez.idcabeza}>{examenCabez.nombre_cabeza}</option>
                                 ))}
@@ -354,7 +398,8 @@ export default function FormularioHistorialM() {
                     <div>
                         <div className="mb-3">
                             <label className="block text-gray-700 text-sm font-bold mb-2">Cara:</label>
-                            <select name="ididentificacion" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <select required defaultValue={inputValues.idexamen_cara} onChange={handleInputChange} name="idexamen_cara" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <option value="">--Selecciona--</option>
                                 {examenCara.map(examenCara => (
                                     <option key={examenCara.idcara} value={examenCara.idcara}>{examenCara.nombre_cara}</option>
                                 ))}
@@ -368,7 +413,8 @@ export default function FormularioHistorialM() {
                     <div>
                         <div className="mb-3">
                             <label className="block text-gray-700 text-sm font-bold mb-2">ATM:</label>
-                            <select name="ididentificacion" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <select required defaultValue={inputValues.idexamen_atm} onChange={handleInputChange} name="idexamen_atm" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <option value="">--Selecciona--</option>
                                 {examenATM.map(examenATM => (
                                     <option key={examenATM.idatm} value={examenATM.idatm}>{examenATM.nombre_atm}</option>
                                 ))}
@@ -379,7 +425,8 @@ export default function FormularioHistorialM() {
                     <div>
                         <div className="mb-3">
                             <label className="block text-gray-700 text-sm font-bold mb-2">Ganglios:</label>
-                            <select name="ididentificacion" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <select required defaultValue={inputValues.idexamen_ganglios} onChange={handleInputChange} name="idexamen_ganglios" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <option value="">--Selecciona--</option>
                                 {examenGanglios.map(examenGanglio => (
                                     <option key={examenGanglio.idganglios} value={examenGanglio.idganglios}>{examenGanglio.nombre_ganglios}</option>
                                 ))}
@@ -392,7 +439,8 @@ export default function FormularioHistorialM() {
                     <div>
                         <div className="mb-3">
                             <label className="block text-gray-700 text-sm font-bold mb-2">Labios:</label>
-                            <select name="ididentificacion" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <select required defaultValue={inputValues.idexamen_labios} onChange={handleInputChange} name="idexamen_labios" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <option value="">--Selecciona--</option>
                                 {examenLabios.map(examenLabio => (
                                     <option key={examenLabio.idlabios} value={examenLabio.idlabios}>{examenLabio.nombre_labios}</option>
                                 ))}
@@ -403,7 +451,8 @@ export default function FormularioHistorialM() {
                     <div>
                         <div className="mb-3">
                             <label className="block text-gray-700 text-sm font-bold mb-2">Señas particulares:</label>
-                            <select name="ididentificacion" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <select required defaultValue={inputValues.idexamen_señasp} onChange={handleInputChange} name="idexamen_señasp" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <option value="">--Selecciona--</option>
                                 {examenSeñas.map(examenSeña => (
                                     <option key={examenSeña.idseñas} value={examenSeña.idseñas}>{examenSeña.nombre_señasp}</option>
                                 ))}
@@ -451,14 +500,19 @@ export default function FormularioHistorialM() {
 
         // Obtiene los datos de las enfermedades
         const diseasesData = getDiseasesData();
-        // const preguntas = {
-        //     preguntaComplicaciones: preguntaComplicaciones?.current?.value?.trim(),
-        //     preguntaTratamiento: preguntaTratamiento?.current?.value?.trim(),
-        //     preguntaMedicamentos: preguntaMedicamentos?.current?.value?.trim(),
-        //     preguntaAlergias: preguntaAlergias?.current?.value?.trim(),
+        const preguntas = {
+            respuesta1: inputCompliaciones ? inputCompliaciones : '',
+            respuesta2: inputTratamineto ? inputTratamineto : '',
+            respuesta3: inputMedicamentos ? inputMedicamentos : '',
+            respuesta4: inputAlergias ? inputAlergias : '',
+        }
+        // const examenes = {
+        //     idexamen_cabeza: inputExamenCabeza ? inputExamenCabeza : '',
         // }
-        // console.log(preguntaAlergias);
-        handleSubmitHistorial(diseasesData, "", "", consulta.cita.paciente.idpaciente, consulta.idconsulta);
+        // console.log(preguntas);
+        console.log(inputValues);
+        // console.log(e);
+        handleSubmitHistorial(diseasesData, preguntas, inputValues, consulta.cita.paciente.idpaciente, consulta.idconsulta);
         // console.log(diseasesData);
         // Aquí tienes los datos para enviar
 

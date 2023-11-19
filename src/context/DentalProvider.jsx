@@ -82,21 +82,33 @@ const DentalProvider = ({ children }) => {
 
     const handleSubmitHistorial = async (arrayEnfermedades, Preguntas, Examenes, idPaciente, idConsulta) => {
         try {
-            for (let index = 0; index < arrayEnfermedades.length; index++) {   
-                const datosEnfermedad = {
-                    idenfermedadpaciente: idConsulta,
-                    idpaciente: arrayEnfermedades[index].idpaciente,
-                    idenfermedad: arrayEnfermedades[index].idenfermedad,
-                    tratamiento_enfermedad: arrayEnfermedades[index].tratamiento_enfermedad,
-                }                             
-                // const { data:datosEnfermedadP } = await clienteAxios.post(`api/enfermedad_paciente`,  datosEnfermedad);                
+
+            if (arrayEnfermedades.length > 0) {
+                for (let index = 0; index < arrayEnfermedades.length; index++) {
+                    const datosEnfermedad = {
+                        idenfermedadpaciente: idConsulta,
+                        idpaciente: arrayEnfermedades[index].idpaciente,
+                        idenfermedad: arrayEnfermedades[index].idenfermedad,
+                        tratamiento_enfermedad: arrayEnfermedades[index].tratamiento_enfermedad,
+                    }
+                    // console.log(datosEnfermedad);                               
+                    // const { data: datosEnfermedadP } = await clienteAxios.post(`api/enfermedad_paciente`, datosEnfermedad);
+                    // console.log(datosEnfermedadP); 
+                }
             }
-            console.log(Preguntas);
-            // const { data:datosPreguntas } = await clienteAxios.post(`api/enfermedad_paciente`,  Preguntas);                
+
+            // if (Preguntas.respuesta1 !== '' || Preguntas.respuesta2 !== '' || Preguntas.respuesta3 !== '' || Preguntas.respuesta4 !== '') {
+            //     const { data: datosPreguntas } = await clienteAxios.post(`api/preguntas`, Preguntas);
+            //     console.log(datosPreguntas);
+            // }
+
+            const { data: datosExamenes } = await clienteAxios.post(`api/examen_extraoral`, Examenes);
+            console.log(datosExamenes);
+
 
         } catch (error) {
             // setErrores(Object.values(error.response.data.errors));
-            console.log(error.response.data.errors);
+            console.log(error?.response?.data?.errors);
             const mensajesError = handleErrores(error);
             Swal.fire({
                 icon: 'error',
