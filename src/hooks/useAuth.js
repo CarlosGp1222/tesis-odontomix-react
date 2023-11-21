@@ -34,10 +34,10 @@ export const useAuth = ({ middleware, url }) => {
             // console.log(error.response.data.message);
             let mensajesError = [];
 
-            if (typeof error.response.data.message === 'string') {
-                mensajesError.push(error.response.data.message);
+            if (typeof error.response.data.errors === 'string') {
+                mensajesError.push(error.response.data.errors);
             } else {
-                mensajesError = Object.values(error.response.data.message).map(val =>
+                mensajesError = Object.values(error.response.data.errors).map(val =>
                     Array.isArray(val) ? val.join(' ') : val
                 );
             }

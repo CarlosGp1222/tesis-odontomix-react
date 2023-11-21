@@ -8,7 +8,9 @@ import Vistacliente from './views/cliente/vista-cliente';
 import VistaPaciente from './views/paciente/vista-paciente';
 import VistaCitas from './views/citas/vista-citas';
 import VistaConsultas from './views/consulta/vista-consultas';
+import Odontograma from './views/odontograma/odontograma';
 import FormularioHistorialM from './views/consulta/formulario-historialM';
+import Historial_medico from './views/historial_medico/Historial_medico';
 
 const router = createBrowserRouter([
     {
@@ -81,6 +83,31 @@ const router = createBrowserRouter([
             {
                 path: '/consultas/historial-medico',
                 element: <FormularioHistorialM />,
+            },
+        ],
+    },
+
+    // Historial
+    {
+        path: '/historial',
+        element: <Layout />,
+        children: [
+            {
+                path: '/historial/lista-historial',
+                element: <Historial_medico />,
+            },
+        ],
+    },
+
+
+    // Odontograma
+    {
+        path: '/odontograma',
+        element: <Layout />,
+        children: [
+            {
+                path: '/odontograma/creacion-odontograma',
+                element: <Odontograma />,
             },
         ],
     },

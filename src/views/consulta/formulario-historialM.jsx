@@ -81,12 +81,12 @@ export default function FormularioHistorialM() {
 
     // console.log(step);
     const nextStep = () => {
-
+        if (!isAllDiseasesFilled()) {
+            alert("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
+            return;
+        }
         if (step == 2) {
-            if (!isAllDiseasesFilled()) {
-                alert("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
-                return;
-            }
+            
             if (complications && !preguntaComplicaciones?.current?.value?.trim()) {
                 return;
             } else {
@@ -112,12 +112,12 @@ export default function FormularioHistorialM() {
     };
 
     const prevStep = () => {
-
+        if (!isAllDiseasesFilled()) {
+            alert("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
+            return;
+        }
         if (step == 2) {
-            if (!isAllDiseasesFilled()) {
-                alert("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
-                return;
-            }
+            
             if (complications && !preguntaComplicaciones?.current?.value?.trim()) {
                 return;
             } else {
@@ -346,6 +346,7 @@ export default function FormularioHistorialM() {
                                 </label>
                                 {selectedDiseases[enfermedad.idenfermedades]?.selected && (
                                     <input
+                                        required
                                         type="text"
                                         placeholder={`Detalles de ${enfermedad.nombre_enfermedad}`}
                                         defaultValue={selectedDiseases[enfermedad.idenfermedades]?.text || ''}

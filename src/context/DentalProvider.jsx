@@ -21,6 +21,7 @@ const DentalProvider = ({ children }) => {
     const [examenSeñas, setExamenSeñas] = useState({});
     const [tipoModal, setTipoModal] = useState(false);
     const [refresh, setRefresh] = useState(false);
+    const [idPregunta, setIdPregunta] = useState('');
 
     const handleClickModal = () => {
         if (modal === true) {
@@ -82,7 +83,7 @@ const DentalProvider = ({ children }) => {
 
     const handleSubmitHistorial = async (arrayEnfermedades, Preguntas, Examenes, idPaciente, idConsulta) => {
         try {
-
+            // var idPregunta;
             if (arrayEnfermedades.length > 0) {
                 for (let index = 0; index < arrayEnfermedades.length; index++) {
                     const datosEnfermedad = {
@@ -92,19 +93,26 @@ const DentalProvider = ({ children }) => {
                         tratamiento_enfermedad: arrayEnfermedades[index].tratamiento_enfermedad,
                     }
                     // console.log(datosEnfermedad);                               
-                    // const { data: datosEnfermedadP } = await clienteAxios.post(`api/enfermedad_paciente`, datosEnfermedad);
+                    const { data: datosEnfermedadP } = await clienteAxios.post(`api/enfermedad_paciente`, datosEnfermedad);
                     // console.log(datosEnfermedadP); 
                 }
             }
 
             // if (Preguntas.respuesta1 !== '' || Preguntas.respuesta2 !== '' || Preguntas.respuesta3 !== '' || Preguntas.respuesta4 !== '') {
-            //     const { data: datosPreguntas } = await clienteAxios.post(`api/preguntas`, Preguntas);
-            //     console.log(datosPreguntas);
-            // }
-
+            const { data: datosPreguntas } = await clienteAxios.post(`api/preguntas`, Preguntas);
             const { data: datosExamenes } = await clienteAxios.post(`api/examen_extraoral`, Examenes);
-            console.log(datosExamenes);
+            // console.log(datosExamenes.data.idextraoral);
 
+            const DatosHistorial = {
+                idpaciente: idPaciente,
+                idconsulta: idConsulta,
+                idenfermedad_paciente: idConsulta,
+                idpregunta: datosPreguntas.data.idpreguntas ? datosPreguntas.data.idpreguntas : '',
+                idexamen_extraoral: datosExamenes.data.idextraoral ? datosExamenes.data.idextraoral : '',
+            }
+            console.log(DatosHistorial);
+            const { data: historial } = await clienteAxios.post(`api/historial_medico`, DatosHistorial);
+            console.log(historial);
 
         } catch (error) {
             // setErrores(Object.values(error.response.data.errors));
@@ -122,9 +130,7 @@ const DentalProvider = ({ children }) => {
 
 
     const handleCompletarCita = async (id, url, cita) => {
-
         cita.estado_cita = 1;
-
         try {
             Swal.fire({
                 title: `Desea completar la cita?`,
@@ -133,13 +139,11 @@ const DentalProvider = ({ children }) => {
                 confirmButtonText: 'Save',
                 denyButtonText: `Don't save`,
             }).then(async (result) => {
-                /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {
                     await clienteAxios.put(`${url}/${id}`, cita);
                     const datos = {
                         idcita: cita.idcita,
                         motivo_consulta: cita.concepto_cita,
-                        //fecha actual en formato yyyy-mm-dd con hora 00:00:00
                         fecha_consulta: new Date().toISOString().slice(0, 10) + ' ' + '00:00:00',
                     }
                     const { data: dataCita } = await clienteAxios.post(`api/consultas`, datos);
@@ -179,7 +183,7 @@ const DentalProvider = ({ children }) => {
     const handleErrores = (error) => {
         let mensajesError = [];
 
-        if (typeof error.response.data.message === 'string') {
+        if (typeof error?.response?.data?.message === 'string') {
             mensajesError.push(error.response.data.message);
         } else {
             mensajesError = Object.values(error.response.data.message).map(val =>

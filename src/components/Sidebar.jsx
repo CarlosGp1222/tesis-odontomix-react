@@ -52,6 +52,17 @@ export default function Sidebar() {
             Consultas
           </Link>
         </li>
+        <li className='mb-2'>
+          <Link onClick={() => handleMenuClick('odontograma')} to="/odontograma/odontograma" className={`block py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white ${isPathActive('/odontograma') ? 'bg-cyan-600' : ''}`}>
+            Odontograma
+          </Link>
+        </li>
+        <li className='mb-2'>
+          <Link onClick={() => handleMenuClick('historial')} to="/historial/lista-historial" className={`block py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white ${isPathActive('/historial') ? 'bg-cyan-600' : ''}`}>
+            Historial Médico
+          </Link>
+        </li>
+        
         <li className='mb-2'><Link onClick={() => handleMenuClick('acerca')} to="/" className={`block py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white ${activeMenu == 'acerca' ? 'bg-cyan-600' : ''}`}>Acerca de</Link></li>
         <li className='mb-2'>
           <button className="block w-full text-left py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white">Servicios</button>
