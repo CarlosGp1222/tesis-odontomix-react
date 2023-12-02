@@ -11,7 +11,7 @@ export default function VistaCitas() {
     const [citas, setCitas] = useState([]);
 
     const fetcher = () => clienteAxios('api/citas').then(datos => datos.data);
-    const { data, isLoading } = useSWR('api/citas', fetcher, {
+    const { data, error,isLoading } = useSWR('api/citas', fetcher, {
         refreshInterval: 3000
     });
 
@@ -20,7 +20,7 @@ export default function VistaCitas() {
         if (data && data.data) {
             setCitas(data.data);
         }
-    }, [data]);
+    }, [data, error]);
 
 
     if (isLoading) return <Spinner />
@@ -59,15 +59,10 @@ export default function VistaCitas() {
                                     <div className="p-4">
                                         <h3 className="font-bold text-lg mb-2">Motivo de la cita:</h3>
                                         <p className="text-gray-700 text-base mb-4">{cita.concepto_cita}</p>
-
-                                        {/* <h3 className="font-bold text-lg mb-2">Datos del cliente:</h3>
-                                        <p className="text-gray-700 text-base">Nombre: {cita.cliente.nombre_cliente} {cita.cliente.apellidos_cliente}</p>
-                                        <p className="text-gray-700 text-base">Identificación: {cita.cliente.identificacion_cliente}</p> */}
                                     </div>
 
                                     <div className="mt-auto bg-blue-300 p-4">
                                         <p className="text-gray-700 text-base">Fecha de la cita: <span className="font-bold">{(formatearFechaSinHora(cita.fechahora_cita) + ' a las: ' + formatearHora(cita.fechahora_cita))}</span></p>
-                                        {/* Botones de acciones */}
                                         <div className="flex justify-between pl-4 pr-4 pt-4 border-gray-200">
                                             <button onClick={(event) => handleDatosActual(cita)} className={`${isPending ? '' : 'hidden'} bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded`}>
                                                 Editar
@@ -77,7 +72,7 @@ export default function VistaCitas() {
                                             >
                                                 {isPending ? 'Completar' : 'Ver consulta'}
                                             </button>
-                                            <button className={`bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded ${isPending ? '' : 'flex-1'}`}>
+                                            <button className={`bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded ${isPending ? '' : 'hidden'}`}>
                                                 Eliminar
                                             </button>
                                         </div>

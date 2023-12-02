@@ -8,17 +8,15 @@ import Spinner from "../../components/Spinner";
 export default function VistaPaciente() {
   const {  handleClickModal, handleTipoModal, handleDatosActual, handleEliminarDatos } = useDental();
   const [pacientes, setPacientes] = useState([]);
-  const fetcher = () => clienteAxios('/api/pacientes').then(datos => datos.data)
-  const { data, isLoading } = useSWR('/api/pacientes', fetcher, {
-    refreshInterval: 1000
-  })
+  const fetcher = () => clienteAxios('api/pacientes').then(datos => datos.data)
+  const { data, error,isLoading } = useSWR('api/pacientes', fetcher)
 
   useEffect(() => {
     handleTipoModal('paciente');
     if (data && data.data) {
       setPacientes(data.data);
     }
-  }, [data]);
+  }, [data, error]);
 
   if (isLoading) return <Spinner />
 

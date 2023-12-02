@@ -1,10 +1,8 @@
 import { createContext, useEffect, useState } from 'react'
-import DatabaseSimulator from '../data/DatabaseSimulator';
-import PacientesDatabaseSimulator from '../data/PacientesDatabaseSimulator';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import clienteAxios from '../config/axios';
-
+import {mutate} from 'swr';
 const DentalContext = createContext();
 // const db = new DatabaseSimulator();
 // const pdb = new PacientesDatabaseSimulator();
@@ -12,16 +10,10 @@ const DentalProvider = ({ children }) => {
 
     const [modal, setModal] = useState(false);
     const [datosActual, setDatosActual] = useState({});
-    const [datosId, setDatosId] = useState({});
-    const [examenCabeza, setExamenCabeza] = useState({});
-    const [examenCara, setExamenCara] = useState({});
-    const [examenATM, setExamenATM] = useState({});
-    const [examenGanglios, setExamenGanglios] = useState({});
-    const [examenLabios, setExamenLabios] = useState({});
-    const [examenSeñas, setExamenSeñas] = useState({});
+    const [datosId, setDatosId] = useState({});    
     const [tipoModal, setTipoModal] = useState(false);
     const [refresh, setRefresh] = useState(false);
-    const [idPregunta, setIdPregunta] = useState('');
+    const [datosPosicion, setDatosPosicion] = useState({});//[{}
 
     const handleClickModal = () => {
         if (modal === true) {
@@ -34,19 +26,9 @@ const DentalProvider = ({ children }) => {
         setDatosId(data.data);
     }
 
-    const getExamenes = async () => {
-        const { data } = await clienteAxios.get(`api/examen_cabeza`);
-        setExamenCabeza(data.data);
-        const { data: data2 } = await clienteAxios.get(`api/examen_cara`);
-        setExamenCara(data2.data);
-        const { data: data3 } = await clienteAxios.get(`api/examen_atm`);
-        setExamenATM(data3.data);
-        const { data: data4 } = await clienteAxios.get(`api/examen_ganglios`);
-        setExamenGanglios(data4.data);
-        const { data: data5 } = await clienteAxios.get(`api/examen_labios`);
-        setExamenLabios(data5.data);
-        const { data: data6 } = await clienteAxios.get(`api/señas_particulares`);
-        setExamenSeñas(data6.data);
+    const getExamenes = async () => {        
+        const { data: Poisciones } = await clienteAxios.get(`api/posicion_dental`);
+        setDatosPosicion(Poisciones.data);
     }
 
     useEffect(() => {
@@ -91,6 +73,7 @@ const DentalProvider = ({ children }) => {
                         idpaciente: arrayEnfermedades[index].idpaciente,
                         idenfermedad: arrayEnfermedades[index].idenfermedad,
                         tratamiento_enfermedad: arrayEnfermedades[index].tratamiento_enfermedad,
+                        
                     }
                     // console.log(datosEnfermedad);                               
                     const { data: datosEnfermedadP } = await clienteAxios.post(`api/enfermedad_paciente`, datosEnfermedad);
@@ -109,6 +92,7 @@ const DentalProvider = ({ children }) => {
                 idenfermedad_paciente: idConsulta,
                 idpregunta: datosPreguntas.data.idpreguntas ? datosPreguntas.data.idpreguntas : '',
                 idexamen_extraoral: datosExamenes.data.idextraoral ? datosExamenes.data.idextraoral : '',
+                estado_historial: 0,
             }
             console.log(DatosHistorial);
             const { data: historial } = await clienteAxios.post(`api/historial_medico`, DatosHistorial);
@@ -145,11 +129,13 @@ const DentalProvider = ({ children }) => {
                         idcita: cita.idcita,
                         motivo_consulta: cita.concepto_cita,
                         fecha_consulta: new Date().toISOString().slice(0, 10) + ' ' + '00:00:00',
+                        estado_consulta: 0,
                     }
                     const { data: dataCita } = await clienteAxios.post(`api/consultas`, datos);
                     console.log(dataCita);
                     setRefresh(!refresh);
                     Swal.fire('Cita actualizada correctamente!', '', 'success')
+                    mutate(url);
                 } else if (result.isDenied) {
                     Swal.fire('No se actualizo correctamente', '', 'info')
                 }
@@ -166,6 +152,7 @@ const DentalProvider = ({ children }) => {
             const { data } = await clienteAxios.post(`${url}`, datos);
             toast.info(`Datos ingresados correctamente`);
             handleClickModal();
+            mutate(url);
         } catch (error) {
             // setErrores(Object.values(error.response.data.errors));
             console.log(error.response.data.errors);
@@ -183,10 +170,10 @@ const DentalProvider = ({ children }) => {
     const handleErrores = (error) => {
         let mensajesError = [];
 
-        if (typeof error?.response?.data?.message === 'string') {
-            mensajesError.push(error.response.data.message);
+        if (typeof error?.response?.data?.errors === 'string') {
+            mensajesError.push(error.response.data.errors);
         } else {
-            mensajesError = Object.values(error.response.data.message).map(val =>
+            mensajesError = Object.values(error.response.data.errors).map(val =>
                 Array.isArray(val) ? val.join(' ') : val
             );
         }
@@ -194,26 +181,51 @@ const DentalProvider = ({ children }) => {
     }
 
     const handleEditarDatos = (id, usr, url) => {
-        Swal.fire({
-            title: `Desea actualizar informacion?`,
-            showDenyButton: true,
-            showCancelButton: true,
-            confirmButtonText: 'Save',
-            denyButtonText: `Don't save`,
-        }).then(async (result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-                const { data } = await clienteAxios.put(`${url}/${id}`, usr);
-                setRefresh(!refresh);
-                Swal.fire('Cambios Guardados!', '', 'success')
-                toast.info(`Datos actualizado correctamente`);
-                handleClickModal();
-            } else if (result.isDenied) {
-                Swal.fire('No se guardaron los cambios', '', 'info')
-                handleClickModal();
-            }
+        try {
 
-        })
+            Swal.fire({
+                title: `Desea actualizar informacion?`,
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: 'Save',
+                denyButtonText: `Don't save`,
+            }).then(async (result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    try {
+
+                        const { data } = await clienteAxios.put(`${url}/${id}`, usr);
+                        mutate(url);
+                        setRefresh(!refresh);
+                        Swal.fire('Cambios Guardados!', '', 'success')
+                        toast.info(`Datos actualizado correctamente`);
+                        handleClickModal();
+                        
+                    } catch (error) {
+                        console.log(error?.response?.data?.errors);
+                        const mensajesError = handleErrores(error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: mensajesError[0]
+                        })
+                    }
+                    
+                } else if (result.isDenied) {
+                    Swal.fire('No se guardaron los cambios', '', 'info')
+                    handleClickModal();
+                }
+
+            })
+        } catch (error) {
+            console.log(error?.response?.data?.errors);
+            const mensajesError = handleErrores(error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: mensajesError[0]
+            })
+        }
     }
 
     const handleToastSuccess = (metodo) => {
@@ -293,13 +305,9 @@ const DentalProvider = ({ children }) => {
                 refresh,
                 datosId,
                 handleCompletarCita,
-                examenCabeza,
-                examenCara,
-                examenATM,
-                examenGanglios,
-                examenLabios,
-                examenSeñas,
-                handleSubmitHistorial
+                handleSubmitHistorial,
+                datosPosicion,
+                handleErrores
             }}
         >
             {children}

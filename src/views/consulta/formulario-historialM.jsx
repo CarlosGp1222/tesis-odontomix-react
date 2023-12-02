@@ -10,6 +10,7 @@ export default function FormularioHistorialM() {
     const [complications, setComplications] = useState(false);
     const [beingTreated, setBeingTreated] = useState(false);
     const [takingMedication, setTakingMedication] = useState(false);
+    
     const [allergic, setAllergic] = useState(false);
     const preguntaComplicaciones = createRef();
     const preguntaTratamiento = createRef();
@@ -17,6 +18,12 @@ export default function FormularioHistorialM() {
     const preguntaAlergias = createRef();
     const [inputCompliaciones, setInputComplicaciones] = useState('');
     const [inputTratamineto, setInputTratamiento] = useState('');
+    const [examenCabeza, setExamenCabeza] = useState({});
+    const [examenCara, setExamenCara] = useState({});
+    const [examenATM, setExamenATM] = useState({});
+    const [examenGanglios, setExamenGanglios] = useState({});
+    const [examenLabios, setExamenLabios] = useState({});
+    const [examenSeñas, setExamenSeñas] = useState({});
     const [inputMedicamentos, setInputMedicamentos] = useState('');
     const [inputAlergias, setInputAlergias] = useState('');
     const [inputExamenCabeza, setInputExamenCabeza] = useState('');
@@ -31,7 +38,7 @@ export default function FormularioHistorialM() {
 
     // Función para manejar los cambios de los inputs
 
-    const { examenCabeza, examenCara, examenATM, examenGanglios, examenLabios, examenSeñas, handleSubmitHistorial } = useDental();
+    const { handleSubmitHistorial } = useDental();
 
     const idconsulta = localStorage.getItem('IDCONSULTA');
     const [selectedDiseases, setSelectedDiseases] = useState([]);
@@ -58,14 +65,31 @@ export default function FormularioHistorialM() {
     };
 
     const fetcher = () => clienteAxios(`api/consultas/${idconsulta}`).then(datos => datos.data);
-    const { data: datosConsultas, isLoading } = useSWR(`api/consultas/${idconsulta}`, fetcher, {
-        refreshInterval: 15000
-    });
+    const { data: datosConsultas, isLoading } = useSWR(`api/consultas/${idconsulta}`, fetcher);
 
     const fetcherEnfermedades = () => clienteAxios(`api/enfermedades`).then(datos => datos.data);
-    const { data: datosEnfermedades, isLoading: loadingEnfermedades } = useSWR(`api/enfermedades`, fetcherEnfermedades, {
-        refreshInterval: 15000
-    });
+    const { data: datosEnfermedades, isLoading: loadingEnfermedades } = useSWR(`api/enfermedades`, fetcherEnfermedades);
+
+    const cargarExamenes = async () => {
+        const { data } = await clienteAxios.get(`api/examen_cabeza`);
+        setExamenCabeza(data.data);
+        console.log(data.data);
+        const { data: data2 } = await clienteAxios.get(`api/examen_cara`);
+        setExamenCara(data2.data);
+        console.log(data2.data);
+        const { data: data3 } = await clienteAxios.get(`api/examen_atm`);
+        setExamenATM(data3.data);
+        console.log(data3.data);
+        const { data: data4 } = await clienteAxios.get(`api/examen_ganglios`);
+        setExamenGanglios(data4.data);
+        console.log(data4.data);
+        const { data: data5 } = await clienteAxios.get(`api/examen_labios`);
+        setExamenLabios(data5.data);
+        console.log(data5.data);
+        const { data: data6 } = await clienteAxios.get(`api/señas_particulares`);
+        setExamenSeñas(data6.data);
+        console.log(data6.data);
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -76,6 +100,10 @@ export default function FormularioHistorialM() {
     };
 
     useEffect(() => {
+        cargarExamenes()
+    }, []);
+
+    useEffect(() => {        
         handleInputChange
     }, [inputValues]);
 
@@ -507,18 +535,8 @@ export default function FormularioHistorialM() {
             respuesta3: inputMedicamentos ? inputMedicamentos : '',
             respuesta4: inputAlergias ? inputAlergias : '',
         }
-        // const examenes = {
-        //     idexamen_cabeza: inputExamenCabeza ? inputExamenCabeza : '',
-        // }
-        // console.log(preguntas);
         console.log(inputValues);
-        // console.log(e);
         handleSubmitHistorial(diseasesData, preguntas, inputValues, consulta.cita.paciente.idpaciente, consulta.idconsulta);
-        // console.log(diseasesData);
-        // Aquí tienes los datos para enviar
-
-
-        // Aquí iría el código para procesar el formulario con los datos recogidos
     };
 
     const renderStep = () => {

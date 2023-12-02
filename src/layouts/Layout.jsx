@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import 'sweetalert2/src/sweetalert2.scss'
 import PacienteModal from "../components/PacienteModal";
 import CitasModal from "../components/CitasModal";
+import ModalDiente from "../components/ModalDiente";
 const customStyles = {
   content: {
     top: '50%',
@@ -36,6 +37,7 @@ export default function Layout() {
         {tipoModal == 'cliente' ? <ClienteModal /> : null}
         {tipoModal == 'paciente' ? <PacienteModal /> : null}
         {tipoModal == 'citas' ? <CitasModal /> : null}
+        {tipoModal == 'odontograma' ? <ModalDiente /> : null}
       </Modal>
       <ToastContainer />
     </>

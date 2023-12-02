@@ -53,12 +53,12 @@ export default function Sidebar() {
           </Link>
         </li>
         <li className='mb-2'>
-          <Link onClick={() => handleMenuClick('odontograma')} to="/odontograma/odontograma" className={`block py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white ${isPathActive('/odontograma') ? 'bg-cyan-600' : ''}`}>
+          <Link onClick={() => handleMenuClick('odontograma')} to="/odontograma/creacion-odontograma" className={`block py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white ${isPathActive('/odontograma') ? 'bg-cyan-600' : ''}`}>
             Odontograma
           </Link>
         </li>
         <li className='mb-2'>
-          <Link onClick={() => handleMenuClick('historial')} to="/historial/lista-historial" className={`block py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white ${isPathActive('/historial') ? 'bg-cyan-600' : ''}`}>
+          <Link onClick={() => handleMenuClick('lista-historial')} to="/historial/lista-historial" className={`block py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white ${isPathActive('/lista-historial') ? 'bg-cyan-600' : ''}`}>
             Historial Médico
           </Link>
         </li>

@@ -230,7 +230,7 @@ export default function CitasModal() {
 
         <div className="col-span-2 flex justify-end">
           <button type="submit" className="bg-slate-800 text-white px-6 py-2 rounded-full hover:bg-slate-900 focus:outline-none focus:bg-slate-900">
-            Crear Cita
+          {datosActual.idcita ? 'Actualizar Cita' : 'Crear Cita'}
           </button>
         </div>
       </form>

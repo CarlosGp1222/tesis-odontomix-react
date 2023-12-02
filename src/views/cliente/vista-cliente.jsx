@@ -8,25 +8,18 @@ import Spinner from "../../components/Spinner";
 
 export default function Vistacliente() {
 
-    const { handleClickModal, handleGetDatos, handleDatosActual, handleTipoModal, handleEliminarDatos  } = useDental();
+    const { handleClickModal, handleDatosActual, handleTipoModal, handleEliminarDatos  } = useDental();
     const [clientes, setClientes] = useState([]);
     
-    // useEffect(() => {
-        
-    // }, []);
-
-    
     const fetcher = () => clienteAxios('api/clientes').then(datos => datos.data)
-    const { data, isLoading } = useSWR('api/clientes', fetcher, {
-        refreshInterval: 3000
-    })
+    const { data, error,isLoading } = useSWR('api/clientes', fetcher)
 
     useEffect(() => {
         handleTipoModal('cliente');
         if (data && data.data) {
             setClientes(data.data);
         }
-    }, [data]);
+    }, [data, error]);
     
     if (isLoading) return <Spinner />
 
