@@ -18,9 +18,7 @@ export const useAuth = ({ middleware, url }) => {
             throw Error(error?.response?.data?.errors)
         })
     );
-
-
-    // En tu hook useAuth
+        
     const login = async (datos, setErrores) => {
         try {
             const { data } = await clienteAxios.post('api/login', datos);

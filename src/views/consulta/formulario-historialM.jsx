@@ -2,10 +2,12 @@ import { createRef, useCallback, useEffect, useState } from 'react'
 import clienteAxios from '../../config/axios';
 import useSWR from 'swr';
 import Spinner from '../../components/Spinner';
+import { useNavigate  } from "react-router-dom";
 import useDental from '../../hooks/useDental';
 // import useDental from '../../context/DentalContext';
 
 export default function FormularioHistorialM() {
+    const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [complications, setComplications] = useState(false);
     const [beingTreated, setBeingTreated] = useState(false);
@@ -73,22 +75,16 @@ export default function FormularioHistorialM() {
     const cargarExamenes = async () => {
         const { data } = await clienteAxios.get(`api/examen_cabeza`);
         setExamenCabeza(data.data);
-        console.log(data.data);
         const { data: data2 } = await clienteAxios.get(`api/examen_cara`);
         setExamenCara(data2.data);
-        console.log(data2.data);
         const { data: data3 } = await clienteAxios.get(`api/examen_atm`);
         setExamenATM(data3.data);
-        console.log(data3.data);
         const { data: data4 } = await clienteAxios.get(`api/examen_ganglios`);
         setExamenGanglios(data4.data);
-        console.log(data4.data);
         const { data: data5 } = await clienteAxios.get(`api/examen_labios`);
         setExamenLabios(data5.data);
-        console.log(data5.data);
         const { data: data6 } = await clienteAxios.get(`api/señas_particulares`);
         setExamenSeñas(data6.data);
-        console.log(data6.data);
     };
 
     const handleInputChange = (e) => {
@@ -508,7 +504,6 @@ export default function FormularioHistorialM() {
     );
 
     const getDiseasesData = () => {
-        // console.log(consulta);
         return Object.entries(selectedDiseases)
             .filter(([_, diseaseData]) => diseaseData.selected && diseaseData.text)
             .map(([diseaseId, diseaseData]) => {
@@ -525,9 +520,6 @@ export default function FormularioHistorialM() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-
-
-        // Obtiene los datos de las enfermedades
         const diseasesData = getDiseasesData();
         const preguntas = {
             respuesta1: inputCompliaciones ? inputCompliaciones : '',
@@ -536,7 +528,7 @@ export default function FormularioHistorialM() {
             respuesta4: inputAlergias ? inputAlergias : '',
         }
         console.log(inputValues);
-        handleSubmitHistorial(diseasesData, preguntas, inputValues, consulta.cita.paciente.idpaciente, consulta.idconsulta);
+        handleSubmitHistorial(diseasesData, preguntas, inputValues, consulta.cita.paciente.idpaciente, consulta.idconsulta, navigate);
     };
 
     const renderStep = () => {

@@ -11,9 +11,7 @@ export default function VistaConsultas() {
   const [consultas, setConsultas] = useState([]);
   const { handleDatosActual, handleCompletarCita, handleTipoModal } = useDental();
   const fetcher = () => clienteAxios('api/consultas').then(datos => datos.data);
-  const { data, isLoading } = useSWR('api/consultas', fetcher, {
-    refreshInterval: 3000
-  });
+  const { data, error, isLoading } = useSWR('api/consultas', fetcher);
 
   const handleRealizarHistorial = (consulta) => {
     localStorage.setItem('IDCONSULTA', consulta.idconsulta);
@@ -25,7 +23,7 @@ export default function VistaConsultas() {
     if (data && data.data) {
       setConsultas(data.data);
     }
-  }, [data]);
+  }, [data, error]);
 
   if (isLoading) return <Spinner />
 

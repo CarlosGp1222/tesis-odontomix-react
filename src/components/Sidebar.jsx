@@ -29,7 +29,7 @@ export default function Sidebar() {
   return (
     <div className={`w-64 space-y-6 py-7 px-5 border-r-4 bg-slate-800 text-white`}>
       <Link to="/" className="text-xl font-semibold text-cyan-600 border-b-2 border-cyan-600 pb-2">
-        <img src="../img/odontomixSinFondo.png" alt="Logotipo menu" />
+        <img src="../../img/odontomixSinFondo.png" alt="Logotipo menu" />
       </Link>
       <ul>
         <li className='mb-2'>

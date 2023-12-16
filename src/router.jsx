@@ -109,6 +109,10 @@ const router = createBrowserRouter([
                 path: '/odontograma/creacion-odontograma',
                 element: <Odontograma />,
             },
+            {
+                path: '/odontograma/creacion-odontograma/:idHistorial',
+                element: <Odontograma />,
+            },
         ],
     },
 ]);

@@ -19,14 +19,10 @@ export default function CitasModal() {
   const hora = createRef();
 
   const fetcherCliente = () => clienteAxios('api/clientes').then(datos => datos.data);
-  const { data: dataCliente } = useSWR('api/clientes', fetcherCliente, {
-    refreshInterval: 5000
-  });
+  const { data: dataCliente } = useSWR('api/clientes', fetcherCliente);
 
   const fetcherPaciente = () => clienteAxios('api/pacientes').then(datos => datos.data);
-  const { data: dataPaciente } = useSWR('api/pacientes', fetcherPaciente, {
-    refreshInterval: 5000
-  });
+  const { data: dataPaciente } = useSWR('api/pacientes', fetcherPaciente);
 
   const handleClienteChange = (e) => {
     setInputCliente(e.target.value);
