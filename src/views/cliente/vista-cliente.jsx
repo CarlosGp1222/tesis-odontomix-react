@@ -1,4 +1,4 @@
-import DatabaseSimulator from "../../data/DatabaseSimulator";
+
 import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa'; // Importando íconos de Font Awesome
 import useDental from "../../hooks/useDental";

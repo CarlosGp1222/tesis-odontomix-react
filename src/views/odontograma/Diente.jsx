@@ -88,14 +88,30 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha }
         }
     };
 
-    const dienteConCondicionTres = dientes.length > 0 && dientes.some(diente => diente.idubicaciond === idubicacion && diente.idcondicionesd === 3 && diente.idposiciond === 5);
-    const borderColor = dienteConCondicionTres ? 'border-blue-600 rounded-full' : ''; // Color azul si idcondicionesd es 3
+    // const dienteConCondicionTres = dientes.length > 0 && dientes.some(diente => diente.idubicaciond === idubicacion && diente.idcondicionesd === 3 && diente.idposiciond === 5);
+    const dienteConCondicionEspecial = dientes.length > 0 && dientes.find(diente => 
+        diente.idubicaciond === idubicacion && 
+        (diente.idcondicionesd === 3 || diente.idcondicionesd === 4) && 
+        diente.idposiciond === 5
+    );
+
+    let borderColor = '';
+    if (dienteConCondicionEspecial) {
+        if (dienteConCondicionEspecial.idcondicionesd === 3) {
+            borderColor = 'border-blue-600 rounded-full';
+        } else if (dienteConCondicionEspecial.idcondicionesd === 4) {
+            borderColor = 'border-red-600 rounded-full';
+        }
+    }
+
+    // console.log(dienteConCondicionTres);
+    // const borderColor = dienteConCondicionTres ? 'border-blue-600 rounded-full' : ''; // Color azul si idcondicionesd es 3
     // const tieneCondicionTres = dientes.length > 0 && dientes.some(diente => diente.idubicaciond === idubicacion && diente.idcondicionesd === 3);
     // const bordeExterior = tieneCondicionTres ? 'border-blue-500' : 'border-gray-400'; // Aplica borde azul si idcondicionesd es 3
 
 
     const getIconColor = (diente) => {
-        return diente?.idcondicionesd === 1 || diente?.idcondicionesd === 3 ? 'blue' : diente?.idcondicionesd === 2 ? 'red' : 'transparent';
+        return diente?.idcondicionesd === 1 ? 'blue' : diente?.idcondicionesd === 2 ? 'red' : 'transparent';
     };
 
 
