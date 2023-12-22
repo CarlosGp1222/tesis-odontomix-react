@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import useDental from '../hooks/useDental';
 import { FaTimes } from 'react-icons/fa';
 import { PiTooth } from "react-icons/pi";
@@ -18,18 +18,29 @@ export default function ModalDiente() {
   const condiciones = condicionesDatos?.data;
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedCondicion, setSelectedCondicion] = useState('');
+  const [seleccionador, setSeleccionador] = useState(false);
+  const [ubicaciones, setUbicaciones] = useState([]);
+  const [ubicacionesSeleccionadas, setUbicacionesSeleccionadas] = useState([]);
+  const [ubicacionesDientes, setUbicacionesDientes] = useState([]);
+  const [selectedUbicaciones, setSelectedUbicaciones] = useState([]);
+
+
+  const { data: datosUbicaciones, isLoading: isLoadingUbicaciones } = useSWR('api/ubicacion_dental', () => clienteAxios('api/ubicacion_dental').then(res => res.data));
+
+
 
   const handleCondicionChange = (condicion) => {
+
     setSelectedCondicion(condicion);
     setDropdownOpen(false);
   };
 
-  const handleEnviarOdonto = (e) => {    
+  const handleEnviarOdonto = (e) => {
 
     e.preventDefault();
-    
+
     const data = new FormData(e.target);
-    
+
     if (!data.get('tratamiento') || (selectedCondicion === '' && !datosActual.idcondicionesd)) {
       handleErrorSweet('Debe seleccionar un tratamiento y una condición');
       return;
@@ -41,18 +52,98 @@ export default function ModalDiente() {
       idubicaciond: datosActual.idubicacion,
       idcondicionesd: selectedCondicion ? selectedCondicion : datosActual.idcondicionesd,
       idtratamientos: data.get('tratamiento'),
-      nombre_diente: datosActual.nombre_diente,
+      // nombre_diente: datosActual.nombre_diente,
       descripcion_diente: data.get('descripcion') != null || data.get('descripcion') != '' ? data.get('descripcion') : '',
       idhistorial: datosActual.idHistorial,
     }
 
-    handleIngresarDatos(datos, 'api/dientes');
+    ubicacionesSeleccionadas.forEach(ubicacion => {
+      datos.idubicaciond = ubicacion;
+      console.log(datos);
+      // handleIngresarDatos(datos, 'api/dientes');
+    });
 
-    setTimeout(() => {
-      window.location.reload();
-    }, 2000);
+    // handleIngresarDatos(datos, 'api/dientes');
+
+    // setTimeout(() => {
+    //   window.location.reload();
+    // }, 2000);
 
   }
+
+
+
+  useEffect(() => {
+    if (datosUbicaciones) {
+      setUbicaciones(datosUbicaciones.data);
+      setUbicacionesSeleccionadas([datosActual.idubicacion]);
+    }
+  }, [datosUbicaciones]);
+
+  const obtenerDientesAdyacentes = (numDiente, ubicaciones) => {
+    const numDienteInt = parseInt(numDiente);
+    let adyacentes = [];
+    const ubicacionAnterior = ubicaciones.find(ubicacion => ubicacion.ubicacion_diente === numDienteInt - 1);
+    if (ubicacionAnterior) adyacentes.push(ubicacionAnterior.idubicaciond);
+    const ubicacionSiguiente = ubicaciones.find(ubicacion => ubicacion.ubicacion_diente === numDienteInt + 1);
+    if (ubicacionSiguiente) adyacentes.push(ubicacionSiguiente.idubicaciond);
+  
+    return adyacentes;
+  };
+  
+
+  useEffect(() => {
+    if (selectedCondicion === 9 || selectedCondicion === 10 || selectedCondicion === 11) {
+      setSeleccionador(true);
+      const adyacentes = obtenerDientesAdyacentes(datosActual.numDiente, datosUbicaciones.data);
+      setUbicacionesSeleccionadas([datosActual.idubicacion, ...adyacentes]);
+    } else {
+      setSeleccionador(false);
+    }
+  }, [selectedCondicion, ubicaciones, datosActual.numDiente]);
+
+  const obtenerRango = (numDiente) => {
+    if (numDiente >= 11 && numDiente <= 18) return [11, 12, 13, 14, 15, 16, 17, 18];
+    if (numDiente >= 51 && numDiente <= 55) return [51, 52, 53, 54, 55];
+    if (numDiente >= 21 && numDiente <= 28) return [21, 22, 23, 24, 25, 26, 27, 28];
+    if (numDiente >= 61 && numDiente <= 65) return [61, 62, 63, 64, 65];
+    if (numDiente >= 81 && numDiente <= 85) return [81, 82, 83, 84, 85];
+    if (numDiente >= 41 && numDiente <= 48) return [41, 42, 43, 44, 45, 46, 47, 48];
+    if (numDiente >= 71 && numDiente <= 75) return [71, 72, 73, 74, 75];
+    if (numDiente >= 31 && numDiente <= 38) return [31, 32, 33, 34, 35, 36, 37, 38];
+  };
+
+  const checkboxesDientes = () => {
+    if (!seleccionador || !ubicaciones.length) return null;
+
+    const rangoNumDientes = obtenerRango(datosActual.numDiente);
+    if (!rangoNumDientes) return null;
+    const rangoUbicaciones = ubicaciones?.filter(ubicacion => rangoNumDientes.includes(ubicacion.ubicacion_diente)) || [];
+
+    return rangoUbicaciones.map(ubicacion => (
+      <label key={ubicacion.idubicaciond} className={` flex flex-col justify-center items-center ${datosActual.idubicacion === ubicacion.idubicaciond ? 'border-b-2 text-center border-indigo-900' : ''}`}>
+        
+        <input
+          className={`${datosActual.idubicacion === ubicacion.idubicaciond ? 'hidden' : ''}`}
+          type="checkbox"
+          value={ubicacion.idubicaciond}
+          defaultChecked={ubicacionesSeleccionadas.includes(ubicacion.idubicaciond)}
+          onChange={() => handleCheckboxChange(ubicacion.idubicaciond)}
+        />
+        {ubicacion.ubicacion_diente}
+      </label>
+    ));
+  };
+
+  const handleCheckboxChange = (idUbicacion) => {
+    setUbicacionesSeleccionadas(prev => {
+      if (prev.includes(idUbicacion)) {
+        return prev.filter(item => item !== idUbicacion);
+      } else {
+        return [...prev, idUbicacion];
+      }
+    });
+  };
 
   return (
     <div className='p-4 overflow-visible'>
@@ -135,6 +226,18 @@ export default function ModalDiente() {
                     </div>
                 }
               </div>
+            </div>
+            <div>
+              {seleccionador && (
+                <div className='gap-4 mt-2 flex flex-col'>
+                  <label className="block text-gray-700 text-sm font-bold">
+                    Dientes: <span className="text-red-500">*</span>
+                  </label>
+                  <div className='flex items-center justify-between'>
+                    {checkboxesDientes()}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

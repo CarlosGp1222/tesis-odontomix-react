@@ -27,7 +27,9 @@ export default function odontograma() {
 
     const refrescarDientes = () => {
         mutate();
-    };
+    };    
+
+    
 
     const fetcher = () => clienteAxios('api/ubicacion_dental').then(datos => datos.data)
     const { data: Datosdientes, isLoading, mutate } = useSWR('api/ubicacion_dental', fetcher)
@@ -39,7 +41,7 @@ export default function odontograma() {
 
     const renderizarDientes = (rangoInicio, rangoFin) => dientes
         .filter(diente => diente.ubicacion_diente >= rangoInicio && diente.ubicacion_diente <= rangoFin)
-        .map(diente => <Diente key={diente.ubicacion_diente} numero={diente.ubicacion_diente} idHistorial={datosId} idubicacion={diente.idubicaciond} nombre_diente={diente.nombre_diente} numeroFicha={idHistorial}/>);
+        .map(diente => <Diente key={diente.ubicacion_diente} numero={diente.ubicacion_diente} idHistorial={datosId} idubicacion={diente.idubicaciond} nombre_diente={diente.nombre_diente} numeroFicha={idHistorial} />);
 
 
 
