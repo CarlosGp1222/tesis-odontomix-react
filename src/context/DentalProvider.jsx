@@ -103,7 +103,7 @@ const DentalProvider = ({ children }) => {
         }
     }
 
-    const handleRedireccionar = (navigate,url) => {
+    const handleRedireccionar = (navigate, url) => {
         navigate(url);
     }
 
@@ -141,13 +141,18 @@ const DentalProvider = ({ children }) => {
         }
     }
 
-    const handleIngresarDatos = async (datos, url) => {
+    const handleIngresarDatos = async (datos, url, reinicio = false) => {
         try {
             console.log(datos);
             const { data } = await clienteAxios.post(`${url}`, datos);
             toast.info(`Datos ingresados correctamente`);
             handleClickModal();
             mutate(url);
+            if (reinicio) {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
         } catch (error) {
             // console.log(error.response.data.errors);
             const mensajesError = handleErrores(error);
@@ -251,7 +256,7 @@ const DentalProvider = ({ children }) => {
 
     }
 
-    const handleDientes = async(id, url) => {
+    const handleDientes = async (id, url) => {
         try {
             const { data } = await clienteAxios.get(`${url}/${id}`);
             setDientes(data.data);
@@ -260,7 +265,7 @@ const DentalProvider = ({ children }) => {
             setDientes({});
         }
     }
-    
+
     return (
         <DentalContext.Provider
             value={{

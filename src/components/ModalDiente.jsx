@@ -63,12 +63,7 @@ export default function ModalDiente() {
       // handleIngresarDatos(datos, 'api/dientes');
     });
 
-    handleIngresarDatos(datos, 'api/dientes');
-
-    setTimeout(() => {
-      window.location.reload();
-    }, 2000);
-
+    handleIngresarDatos(datos, 'api/dientes', true);
   }
 
 
