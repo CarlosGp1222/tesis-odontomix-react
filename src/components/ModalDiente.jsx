@@ -63,11 +63,11 @@ export default function ModalDiente() {
       // handleIngresarDatos(datos, 'api/dientes');
     });
 
-    // handleIngresarDatos(datos, 'api/dientes');
+    handleIngresarDatos(datos, 'api/dientes');
 
-    // setTimeout(() => {
-    //   window.location.reload();
-    // }, 2000);
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000);
 
   }
 
@@ -87,10 +87,10 @@ export default function ModalDiente() {
     if (ubicacionAnterior) adyacentes.push(ubicacionAnterior.idubicaciond);
     const ubicacionSiguiente = ubicaciones.find(ubicacion => ubicacion.ubicacion_diente === numDienteInt + 1);
     if (ubicacionSiguiente) adyacentes.push(ubicacionSiguiente.idubicaciond);
-  
+
     return adyacentes;
   };
-  
+
 
   useEffect(() => {
     if (selectedCondicion === 9 || selectedCondicion === 10 || selectedCondicion === 11) {
@@ -122,7 +122,7 @@ export default function ModalDiente() {
 
     return rangoUbicaciones.map(ubicacion => (
       <label key={ubicacion.idubicaciond} className={` flex flex-col justify-center items-center ${datosActual.idubicacion === ubicacion.idubicaciond ? 'border-b-2 text-center border-indigo-900' : ''}`}>
-        
+
         <input
           className={`${datosActual.idubicacion === ubicacion.idubicaciond ? 'hidden' : ''}`}
           type="checkbox"
@@ -228,7 +228,7 @@ export default function ModalDiente() {
               </div>
             </div>
             <div>
-              {seleccionador && (
+              {seleccionador && datosActual?.idposiciond == 5 && (
                 <div className='gap-4 mt-2 flex flex-col'>
                   <label className="block text-gray-700 text-sm font-bold">
                     Dientes: <span className="text-red-500">*</span>
@@ -246,7 +246,6 @@ export default function ModalDiente() {
             <span className="mr-2">{datosActual?.datosDiente ? 'Guardar Cambios' : 'Guardar'}</span>
           </button>
           {datosActual?.datosDiente && (
-            // boton para eliminar el diente
             <button type="button" className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded flex items-center mt-4">
               <span className="mr-2">Eliminar</span>
             </button>
