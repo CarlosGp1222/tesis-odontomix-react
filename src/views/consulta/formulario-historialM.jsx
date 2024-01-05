@@ -2,17 +2,20 @@ import { createRef, useCallback, useEffect, useState } from 'react'
 import clienteAxios from '../../config/axios';
 import useSWR from 'swr';
 import Spinner from '../../components/Spinner';
-import { useNavigate  } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 import useDental from '../../hooks/useDental';
+import MiniSpinner from '../../components/MiniSpiner';
 // import useDental from '../../context/DentalContext';
 
 export default function FormularioHistorialM() {
+
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [complications, setComplications] = useState(false);
     const [beingTreated, setBeingTreated] = useState(false);
     const [takingMedication, setTakingMedication] = useState(false);
-    
+
     const [allergic, setAllergic] = useState(false);
     const preguntaComplicaciones = createRef();
     const preguntaTratamiento = createRef();
@@ -26,17 +29,72 @@ export default function FormularioHistorialM() {
     const [examenGanglios, setExamenGanglios] = useState({});
     const [examenLabios, setExamenLabios] = useState({});
     const [examenSeñas, setExamenSeñas] = useState({});
+    const [examenEncia, setExamenEncia] = useState({});
+    const [examenLengua, setExamenLengua] = useState({});
+    const [examenPaladarD, setExamenPaladarD] = useState({});
+    const [examenPaladarB, setExamenPaladarB] = useState({});
+    const [examenPisoB, setExamenPisoB] = useState({});
+    const [examenRebordeR, setExamenRebordeR] = useState({});
+    const [examenTipoOclusion, setExamenTipoOclusion] = useState({});
     const [inputMedicamentos, setInputMedicamentos] = useState('');
     const [inputAlergias, setInputAlergias] = useState('');
-    const [inputExamenCabeza, setInputExamenCabeza] = useState('');
+    const [botonHabilitado, setBotonHabilidato] = useState(true);
+    const [archivo, setArchivo] = useState(null);
+
     const [inputValues, setInputValues] = useState({
         idexamen_cabeza: '',
         idexamen_cara: '',
         idexamen_atm: '',
         idexamen_ganglios: '',
         idexamen_labios: '',
-        idexamen_señasp: ''
+        idexamen_señasp: '',
     });
+
+    const [inputExamenIntraoral, setInputExamenIntraoral] = useState({
+        idexamen_encia: '',
+        idexamen_lengua: '',
+        idexamen_paladar_duro: '',
+        idexamen_paladar_blando: '',
+        faringe: '',
+        idexamen_piso_boca: '',
+        idexamen_reborde: '',
+        idexamen_oclusion: '',
+    });
+
+    
+
+
+    const fetchData = async () => {
+        try {
+            const resExamenesExtra = await clienteAxios('api/examenes_extraoral');
+            setExamenCabeza(resExamenesExtra.data.examen_cabeza);
+            setExamenCara(resExamenesExtra.data.examen_cara);
+            setExamenATM(resExamenesExtra.data.examen_atm);
+            setExamenGanglios(resExamenesExtra.data.examen_ganglios);
+            setExamenLabios(resExamenesExtra.data.examen_labios);
+            setExamenSeñas(resExamenesExtra.data.examen_señasp);
+
+
+            const resExamenesIntraOral = await clienteAxios('api/examenes_intraoral');
+            // console.log(resExamenesIntraOral.data);
+            setExamenEncia(resExamenesIntraOral.data.examen_encia);
+            setExamenLengua(resExamenesIntraOral.data.examen_lengua);
+            setExamenPaladarD(resExamenesIntraOral.data.examen_paladar_duro);
+            setExamenPaladarB(resExamenesIntraOral.data.examen_paladar_blando);
+            setExamenRebordeR(resExamenesIntraOral.data.examen_reborde);
+            setExamenTipoOclusion(resExamenesIntraOral.data.examen_oclusion);
+            setExamenPisoB(resExamenesIntraOral.data.examen_piso_boca);
+
+
+        } catch (error) {
+            console.error('Error al cargar los datos:', error);
+        }
+    };
+
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     // Función para manejar los cambios de los inputs
 
@@ -72,20 +130,8 @@ export default function FormularioHistorialM() {
     const fetcherEnfermedades = () => clienteAxios(`api/enfermedades`).then(datos => datos.data);
     const { data: datosEnfermedades, isLoading: loadingEnfermedades } = useSWR(`api/enfermedades`, fetcherEnfermedades);
 
-    const cargarExamenes = async () => {
-        const { data } = await clienteAxios.get(`api/examen_cabeza`);
-        setExamenCabeza(data.data);
-        const { data: data2 } = await clienteAxios.get(`api/examen_cara`);
-        setExamenCara(data2.data);
-        const { data: data3 } = await clienteAxios.get(`api/examen_atm`);
-        setExamenATM(data3.data);
-        const { data: data4 } = await clienteAxios.get(`api/examen_ganglios`);
-        setExamenGanglios(data4.data);
-        const { data: data5 } = await clienteAxios.get(`api/examen_labios`);
-        setExamenLabios(data5.data);
-        const { data: data6 } = await clienteAxios.get(`api/señas_particulares`);
-        setExamenSeñas(data6.data);
-    };
+    // const cargarExamenes = async () => {
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -95,11 +141,19 @@ export default function FormularioHistorialM() {
         });
     };
 
-    useEffect(() => {
-        cargarExamenes()
-    }, []);
+    const handleInputIntraoralChange = (e) => {
+        const { name, value } = e.target;
+        setInputExamenIntraoral({
+            ...inputExamenIntraoral,
+            [name]: value
+        });
+    };
 
-    useEffect(() => {        
+    // useEffect(() => {
+    //     cargarExamenes()
+    // }, []);
+
+    useEffect(() => {
         handleInputChange
     }, [inputValues]);
 
@@ -110,7 +164,7 @@ export default function FormularioHistorialM() {
             return;
         }
         if (step == 2) {
-            
+
             if (complications && !preguntaComplicaciones?.current?.value?.trim()) {
                 return;
             } else {
@@ -141,7 +195,7 @@ export default function FormularioHistorialM() {
             return;
         }
         if (step == 2) {
-            
+
             if (complications && !preguntaComplicaciones?.current?.value?.trim()) {
                 return;
             } else {
@@ -401,107 +455,362 @@ export default function FormularioHistorialM() {
         )
     };
 
-    const StepFour = () => (
-        <div>
-            <section className="mb-8 p-6 bg-white shadow rounded">
-                <h2 className="text-lg font-semibold mb-3">Examen Clínico Extra Oral</h2>
-                {/* 2 labels con selects  */}
-                <div className="grid md:grid-cols-2 gap-4 mb-4">
-                    {/* Columna 1 */}
-                    <div>
-                        <div className="mb-3">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Cabeza:</label>
-                            <select required defaultValue={inputValues.idexamen_cabeza} onChange={handleInputChange} name="idexamen_cabeza" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                            <option value="">--Selecciona--</option>
-                                {examenCabeza.map(examenCabez => (
-                                    <option key={examenCabez.idcabeza} value={examenCabez.idcabeza}>{examenCabez.nombre_cabeza}</option>
-                                ))}
-                            </select>
+    const StepFour = () => {
+        const manejarCambioArchivo = (e) => {
+            const archivoSeleccionado = e.target.files[0];
+            // console.log(archivoSeleccionado);
+            if (archivoSeleccionado) {
+                setArchivo(archivoSeleccionado);
+            }
+        };
+        return (
+            <div>
+                <section className="mb-8 p-6 bg-white shadow rounded">
+                    <h2 className="text-lg font-semibold mb-3">Examen Clínico Extra Oral</h2>
+                    {/* 2 labels con selects  */}
+                    <div className="grid md:grid-cols-2 gap-4 mb-4">
+                        {/* Columna 1 */}
+                        <div>
+                            <div className="mb-3">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Cabeza:</label>
+                                {examenCabeza && examenCabeza.length > 0 ? (
+                                    <select required defaultValue={inputValues.idexamen_cabeza} onChange={handleInputChange} name="idexamen_cabeza" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                        <option value="">--Selecciona--</option>
+                                        {examenCabeza.map(examenCabez => (
+                                            <option key={examenCabez.idcabeza} value={examenCabez.idcabeza}>
+                                                {examenCabez.nombre_cabeza}
+                                            </option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <MiniSpinner />
+                                )}
+                            </div>
+                        </div>
+                        {/* Columna 2 */}
+                        <div>
+                            <div className="mb-3">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Cara:</label>
+                                {examenCara && examenCara.length > 0 ? (
+                                    <select required defaultValue={inputValues.idexamen_cara} onChange={handleInputChange} name="idexamen_cara" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                        <option value="">--Selecciona--</option>
+                                        {examenCara.map(examenCara => (
+                                            <option key={examenCara.idcara} value={examenCara.idcara}>
+                                                {examenCara.nombre_cara}
+                                            </option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <MiniSpinner />
+                                )}
+
+                            </div>
                         </div>
                     </div>
-                    {/* Columna 2 */}
-                    <div>
-                        <div className="mb-3">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Cara:</label>
-                            <select required defaultValue={inputValues.idexamen_cara} onChange={handleInputChange} name="idexamen_cara" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                            <option value="">--Selecciona--</option>
-                                {examenCara.map(examenCara => (
-                                    <option key={examenCara.idcara} value={examenCara.idcara}>{examenCara.nombre_cara}</option>
-                                ))}
-                            </select>
+                    {/* 2 labels con selects  */}
+                    <div className="grid md:grid-cols-2 gap-4 mb-4">
+                        {/* Columna 1 */}
+                        <div>
+                            <div className="mb-3">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">ATM:</label>
+                                {examenATM && examenATM.length > 0 ? (
+                                    <select required defaultValue={inputValues.idexamen_atm} onChange={handleInputChange} name="idexamen_atm" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                        <option value="">--Selecciona--</option>
+                                        {
+
+                                            examenATM.map(examenATM => (
+                                                <option key={examenATM.idatm} value={examenATM.idatm}>{examenATM.nombre_atm}</option>
+                                            ))
+
+                                        }
+                                    </select>
+                                ) : (
+                                    <MiniSpinner />
+                                )}
+                            </div>
+                        </div>
+                        {/* Columna 2 */}
+                        <div>
+                            <div className="mb-3">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Ganglios:</label>
+                                {examenGanglios && examenGanglios.length > 0 ? (
+                                    <select required defaultValue={inputValues.idexamen_ganglios} onChange={handleInputChange} name="idexamen_ganglios" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                        <option value="">--Selecciona--</option>
+                                        {
+
+                                            examenGanglios.map(examenGanglio => (
+                                                <option key={examenGanglio.idganglios} value={examenGanglio.idganglios}>{examenGanglio.nombre_ganglios}</option>
+                                            ))
+
+                                        }
+                                    </select>
+                                ) : (
+                                    <MiniSpinner />
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
-                {/* 2 labels con selects  */}
-                <div className="grid md:grid-cols-2 gap-4 mb-4">
-                    {/* Columna 1 */}
+                    <div className="grid md:grid-cols-2 gap-4 mb-4">
+                        {/* Columna 1 */}
+                        <div>
+                            <div className="mb-3">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Labios:</label>
+                                {examenLabios && examenLabios.length > 0 ? (
+                                    <select required defaultValue={inputValues.idexamen_labios} onChange={handleInputChange} name="idexamen_labios" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                        <option value="">--Selecciona--</option>
+                                        {
+
+                                            examenLabios.map(examenLabio => (
+                                                <option key={examenLabio.idlabios} value={examenLabio.idlabios}>{examenLabio.nombre_labios}</option>
+                                            ))
+
+                                        }
+                                    </select>
+                                ) : (
+                                    <MiniSpinner />
+                                )}
+                            </div>
+                        </div>
+                        {/* Columna 2 */}
+                        <div>
+                            <div className="mb-3">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Señas particulares:</label>
+                                {examenSeñas && examenSeñas.length > 0 ? (
+                                    <select required defaultValue={inputValues.idexamen_señasp} onChange={handleInputChange} name="idexamen_señasp" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                        <option value="">--Selecciona--</option>
+                                        {
+
+                                            examenSeñas.map(examenSeña => (
+                                                <option key={examenSeña.idseñas} value={examenSeña.idseñas}>{examenSeña.nombre_señasp}</option>
+                                            ))
+
+                                        }
+                                    </select>
+                                ) : (
+                                    <MiniSpinner />
+                                )}
+                            </div>
+                        </div>
+                        <h2 className="text-lg font-semibold mb-3">Examen Clínico IntraOral</h2>
+                        <div>
+
+                        </div>
+                        <div>
+                            <div className="mb-3">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Encia:</label>
+                                {examenEncia && examenEncia.length > 0 ? (
+                                    <select required defaultValue={inputExamenIntraoral.idexamen_encia} onChange={handleInputIntraoralChange} name="idexamen_encia" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                        <option value="">--Selecciona--</option>
+                                        {
+                                            examenEncia.map(Encia => (
+                                                <option key={Encia.idencia} value={Encia.idencia}>
+                                                    {Encia.nombre_encia}
+                                                </option>
+                                            ))
+
+                                        }
+                                    </select>
+                                ) : (
+                                    <MiniSpinner />
+                                )}
+                            </div>
+                        </div>
+
+                        <div>
+                            <div className="mb-3">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Lengua:</label>
+                                {examenLengua && examenLengua.length > 0 ? (
+                                    <select required defaultValue={inputExamenIntraoral.idexamen_lengua} onChange={handleInputIntraoralChange} name="idexamen_lengua" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                        <option value="">--Selecciona--</option>
+                                        {
+                                            examenLengua.map(Lengua => (
+                                                <option key={Lengua.idlengua} value={Lengua.idlengua}>
+                                                    {Lengua.nombre_lengua}
+                                                </option>
+                                            ))
+
+                                        }
+                                    </select>
+                                ) : (
+                                    <MiniSpinner />
+                                )}
+                            </div>
+                        </div>
+                        <div>
+                            <div className="mb-3">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Paladar Duro:</label>
+                                {examenPaladarD && examenPaladarD.length > 0 ? (
+                                    <select required defaultValue={inputExamenIntraoral.idexamen_paladar_duro} onChange={handleInputIntraoralChange} name="idexamen_paladar_duro" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+                                        <option value="">--Selecciona--</option>
+                                        {
+                                            examenPaladarD.map(PaladarD => (
+                                                <option key={PaladarD.idpaladard} value={PaladarD.idpaladard}>
+                                                    {PaladarD.nombre_paladard}
+                                                </option>
+                                            ))
+
+                                        }
+                                    </select>
+                                ) : (
+                                    <MiniSpinner />
+                                )}
+                            </div>
+                        </div>
+                        <div>
+                            <div className="mb-3">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Paladar Blando:</label>
+                                {examenPaladarB && examenPaladarB.length > 0 ? (
+                                    <select required defaultValue={inputExamenIntraoral.idexamen_paladar_blando} onChange={handleInputIntraoralChange} name="idexamen_paladar_blando" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+                                        <option value="">--Selecciona--</option>
+                                        {
+                                            examenPaladarB.map(PaladarB => (
+                                                <option key={PaladarB.idpaladarb} value={PaladarB.idpaladarb}>
+                                                    {PaladarB.nombre_paladarb}
+                                                </option>
+                                            ))
+
+                                        }
+                                    </select>
+                                ) : (
+                                    <MiniSpinner />
+                                )}
+                            </div>
+                        </div>
+                        <div>
+                            <div className="mb-3">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Reborde Alveolar:</label>
+                                {examenRebordeR && examenRebordeR.length > 0 ? (
+                                    <select required defaultValue={inputExamenIntraoral.idexamen_reborde} onChange={handleInputIntraoralChange} name="idexamen_reborde" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+                                        <option value="">--Selecciona--</option>
+                                        {
+                                            examenRebordeR.map(RebordeR => (
+                                                <option key={RebordeR.idreborde} value={RebordeR.idreborde}>
+                                                    {RebordeR.nombre_reborde}
+                                                </option>
+                                            ))
+
+                                        }
+                                    </select>
+                                ) : (
+                                    <MiniSpinner />
+                                )}
+                            </div>
+                        </div>
+                        <div>
+                            <div className="mb-3">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Tipo de Oclusión:</label>
+                                {examenTipoOclusion && examenTipoOclusion.length > 0 ? (
+                                    <select required defaultValue={inputExamenIntraoral.idexamen_oclusion} onChange={handleInputIntraoralChange} name="idexamen_oclusion" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+                                        <option value="">--Selecciona--</option>
+                                        {
+                                            examenTipoOclusion.map(TipoOclusion => (
+                                                <option key={TipoOclusion.idoclusion} value={TipoOclusion.idoclusion}>
+                                                    {TipoOclusion.nombre_oclusion}
+                                                </option>
+                                            ))
+
+                                        }
+                                    </select>
+                                ) : (
+                                    <MiniSpinner />
+                                )}
+                            </div>
+                        </div>
+
+                        <div>
+                            <div className="mb-3">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Piso de la boca:</label>
+                                {examenPisoB && examenPisoB.length > 0 ? (
+                                    <select required defaultValue={inputExamenIntraoral.idexamen_piso_boca} onChange={handleInputIntraoralChange} name="idexamen_piso_boca" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+                                        <option value="">--Selecciona--</option>
+                                        {
+                                            examenPisoB.map(PisoB => (
+                                                <option key={PisoB.idboca} value={PisoB.idboca}>
+                                                    {PisoB.nombre_boca}
+                                                </option>
+                                            ))
+
+                                        }
+                                    </select>
+                                ) : (
+                                    <MiniSpinner />
+                                )}
+                            </div>
+                        </div>
+
+                        <div>
+                        </div>
+
+
+
+                    </div>
                     <div>
                         <div className="mb-3">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">ATM:</label>
-                            <select required defaultValue={inputValues.idexamen_atm} onChange={handleInputChange} name="idexamen_atm" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                                <option value="">--Selecciona--</option>
-                                {examenATM.map(examenATM => (
-                                    <option key={examenATM.idatm} value={examenATM.idatm}>{examenATM.nombre_atm}</option>
-                                ))}
-                            </select>
+                            <label className="block text-gray-700 text-sm font-bold mb-2">Faringe:</label>
+                            <textarea
+                                defaultValue={inputExamenIntraoral.faringe}
+                                onBlur={handleInputIntraoralChange}
+                                name="faringe"
+                                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            ></textarea>
                         </div>
                     </div>
-                    {/* Columna 2 */}
-                    <div>
-                        <div className="mb-3">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Ganglios:</label>
-                            <select required defaultValue={inputValues.idexamen_ganglios} onChange={handleInputChange} name="idexamen_ganglios" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                                <option value="">--Selecciona--</option>
-                                {examenGanglios.map(examenGanglio => (
-                                    <option key={examenGanglio.idganglios} value={examenGanglio.idganglios}>{examenGanglio.nombre_ganglios}</option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div className="grid md:grid-cols-2 gap-4 mb-4">
-                    {/* Columna 1 */}
-                    <div>
-                        <div className="mb-3">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Labios:</label>
-                            <select required defaultValue={inputValues.idexamen_labios} onChange={handleInputChange} name="idexamen_labios" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                                <option value="">--Selecciona--</option>
-                                {examenLabios.map(examenLabio => (
-                                    <option key={examenLabio.idlabios} value={examenLabio.idlabios}>{examenLabio.nombre_labios}</option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                    {/* Columna 2 */}
-                    <div>
-                        <div className="mb-3">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Señas particulares:</label>
-                            <select required defaultValue={inputValues.idexamen_señasp} onChange={handleInputChange} name="idexamen_señasp" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                                <option value="">--Selecciona--</option>
-                                {examenSeñas.map(examenSeña => (
-                                    <option key={examenSeña.idseñas} value={examenSeña.idseñas}>{examenSeña.nombre_señasp}</option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div className="flex justify-end">
+
+                    {/* <div className="flex justify-end">
                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
                         Enviar
                     </button>
+                </div> */}
+                    <h2 className="text-lg font-semibold mb-3">Subir Radiografia</h2>
+                    <div className="mb-3">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Radiografia:</label>
+                        <input
+                            type="file"
+                            className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            onChange={manejarCambioArchivo}
+                        />
+                        {archivo && <div className="mt-2 text-gray-600">Archivo seleccionado: {archivo.name}</div>}
+                    </div>
+                    <div className="flex justify-end">
+                        <button className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out`}>
+                            Enviar Formulario
+                        </button>
+                    </div>
+                </section>
+                <div className="flex justify-between">
+                    <button
+                        onClick={prevStep}
+                        className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+                    >
+                        Atrás
+                    </button>
+                    {/* <button onClick={nextStep} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                    Siguiente
+                </button> */}
                 </div>
-            </section>
-            <div className="flex justify-between">
+                {/* <div className="flex justify-between">
                 <button
                     onClick={prevStep}
                     className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
                 >
                     Atrás
                 </button>
-
+                <button onClick={nextStep} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                    Siguiente
+                </button>
+            </div> */}
             </div>
-        </div>
-    );
+        )
+    };
+
+    // el StepFive tendra un input para subir cualquier tipo de archivo
+
+
 
     const getDiseasesData = () => {
         return Object.entries(selectedDiseases)
@@ -527,8 +836,13 @@ export default function FormularioHistorialM() {
             respuesta3: inputMedicamentos ? inputMedicamentos : '',
             respuesta4: inputAlergias ? inputAlergias : '',
         }
-        console.log(inputValues);
-        handleSubmitHistorial(diseasesData, preguntas, inputValues, consulta.cita.paciente.idpaciente, consulta.idconsulta, navigate);
+        // console.log(inputValues);
+        // console.log(inputExamenIntraoral);
+        // console.log(archivo);
+        handleSubmitHistorial(diseasesData, preguntas, inputValues, consulta.cita.paciente.idpaciente, consulta.idconsulta, navigate, inputExamenIntraoral, idconsulta, archivo);
+        setBotonHabilidato(false);
+
+
     };
 
     const renderStep = () => {

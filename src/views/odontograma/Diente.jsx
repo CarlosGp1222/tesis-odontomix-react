@@ -1,22 +1,89 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import useDental from '../../hooks/useDental';
 import Spinner from '../../components/Spinner';
+import { FaRegSquarePlus } from "react-icons/fa6";
+import { FaGripLines } from "react-icons/fa";
 import MiniSpinner from '../../components/MiniSpiner';
 import { IoMdClose } from "react-icons/io";
 import { CgShapeZigzag } from "react-icons/cg";
-const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha }) => {
+const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha, idhemisferio_diente }) => {
+    let error = false;
 
-    const { datosPosicion, handleDatosActual, handleErrorSweet, dientes } = useDental();
-    if (Object.keys(datosPosicion).length === 0) return <MiniSpinner />
+    const [estiloBorde, setEstiloBorde] = useState("");
+    const [estiloLineas, setEstiloLineas] = useState("");
+    const { datosPosicion, handleDatosActual, handleErrorSweet, dientes, modal } = useDental();
 
-    const handlePartClick = (idposiciond) => {
+    const aplicarEstilosInvertidos = idhemisferio_diente >= 5 && idhemisferio_diente <= 8;
 
-        if (typeof idHistorial === 'object' && idHistorial !== null) {
+    useEffect(() => {
+        setEstiloBorde("");
+        setEstiloLineas("");
+        if (dientes && dientes.length > 0) {
+            const dienteActual = dientes.find(d => d.idubicaciond === idubicacion && d.idposiciond === 5);
+            if (dienteActual) {
+                const grupos = dientes.reduce((acc, diente) => {
+                    if (diente.ubicacion_dental.idhemisferio_diente === idhemisferio_diente &&
+                        diente.posicion_dental.idposiciond === 5 &&
+                        [9, 10, 11].includes(diente.condiciones_dentales.idcondicionesd)) {
 
-            handleErrorSweet('Error paciente no encontrado');
-            return;
+                        const clave = `${diente.ubicacion_dental.idhemisferio_diente}-${diente.posicion_dental.idposiciond}-${diente.condiciones_dentales.idcondicionesd}`;
+                        if (!acc[clave]) {
+                            acc[clave] = [];
+                        }
+                        acc[clave].push(diente);
+                        return acc;
+                    }
+                    return acc;
+                }, {});
+                console.log(dientes);
+                // console.log(dienteActual.posicion_dental.idposiciond);
+                const claveGrupo = `${dienteActual.ubicacion_dental.idhemisferio_diente}-${dienteActual.posicion_dental.idposiciond}-${dienteActual.condiciones_dentales.idcondicionesd}`;
+                const grupo = grupos[claveGrupo] || [];
+                // console.log(grupo);
+                // console.log( dienteActual.ubicacion_dental.ubicacion_diente);
+                const esPrimero = grupo[0]?.ubicacion_dental.ubicacion_diente == dienteActual.ubicacion_dental.ubicacion_diente;
+                // console.log(grupo[0]?.ubicacion_dental.ubicacion_diente +" - "+ dienteActual.ubicacion_dental.ubicacion_diente);
+                // console.log(dienteActual.ubicacion_dental.ubicacion_diente);
+                // console.log(grupo[grupo.length - 1]);
+                const esUltimo = grupo[grupo.length - 1]?.ubicacion_dental.ubicacion_diente == dienteActual.ubicacion_dental.ubicacion_diente;
 
+                let nuevoEstiloBorde = "";
+                if (dienteActual.condiciones_dentales.idcondicionesd === 9) {
+                    if (aplicarEstilosInvertidos) {
+                        nuevoEstiloBorde = esUltimo ? "border-t-4 border-b-4 border-l-4 border-blue-600 rounded-l-lg"
+                            : esPrimero ? "border-t-4 border-b-4 border-r-4 border-blue-600 rounded-r-lg"
+                                : "border-t-4 border-b-4 border-blue-600 rounded-none";
+                    } else {
+                        nuevoEstiloBorde = esPrimero ? "border-t-4 border-b-4 border-l-4 border-blue-600 rounded-l-lg"
+                            : esUltimo ? "border-t-4 border-b-4 border-r-4 border-blue-600 rounded-r-lg"
+                                : "border-t-4 border-b-4 border-blue-600";
+                    }
+                } else if (dienteActual.condiciones_dentales.idcondicionesd === 10) {
+                    if (aplicarEstilosInvertidos) {
+                        nuevoEstiloBorde = esUltimo ? "border-t-4 border-b-4 border-l-4 border-red-600 rounded-l-lg"
+                            : esPrimero ? "border-t-4 border-b-4 border-r-4 border-red-600 rounded-r-lg"
+                                : "border-t-4 border-b-4 border-red-600 rounded-none";
+                    } else {
+                        nuevoEstiloBorde = esPrimero ? "border-t-4 border-b-4 border-l-4 border-red-600 rounded-l-lg"
+                            : esUltimo ? "border-t-4 border-b-4 border-r-4 border-red-600 rounded-r-lg"
+                                : "border-t-4 border-b-4 border-red-600";
+                    }
+                }
+
+                setEstiloBorde(nuevoEstiloBorde);
+                let nuevoEstiloLineas = "";
+                
+                if (dienteActual.condiciones_dentales.idcondicionesd === 11) {
+                    nuevoEstiloLineas = esPrimero ? 'F' : esUltimo ? 'L' : 'N';
+                }
+                // console.log(nuevoEstiloLineas);
+                setEstiloLineas(nuevoEstiloLineas);
+            }
         }
+    }, [dientes, idubicacion, idhemisferio_diente]);
+
+    if (Object.keys(datosPosicion).length === 0) return <MiniSpinner />
+    const handlePartClick = (idposiciond) => {
 
         const datosDiente = dientes.find(d => d.idubicaciond === idubicacion && d.idposiciond === idposiciond);
 
@@ -51,7 +118,7 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha }
                             <div className="flex w-full justify-between px-1">
                                 <div className="h-8 w-3 bg-transparent border-2 border-gray-400 cursor-pointer rounded-lg hover:bg-slate-300"
                                     onClick={() => handlePartClick(2)}></div>
-                                <div className="h-8 w-8 bg-transparent border-2 border-gray-400 cursor-pointer rounded-lg hover:bg-slate-300"
+                                <div className="h-8 w-8 bg-transparent border-2 border-gray-400 cursor-pointer rounded-full hover:bg-slate-300 "
                                     onClick={() => handlePartClick(5)}>
                                 </div>
                                 <div className="h-8 w-3 bg-transparent border-2 border-gray-400 cursor-pointer rounded-lg hover:bg-slate-300"
@@ -66,7 +133,7 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha }
         );
     }
 
-    
+
 
     const renderizarParteDiente = (idposicion, classes) => {
         if (dientes.length > 0) {
@@ -74,7 +141,9 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha }
 
             return (
 
-                <div className={`relative ${classes} border-2 border-gray-400 cursor-pointer ${idposicion === 5 ? 'rounded-full' : 'rounded-lg'}`}
+                <div
+                    style={{ zIndex: '0' }}
+                    className={`relative ${classes} border-2 border-gray-400 cursor-pointer ${idposicion === 5 ? 'rounded-full' : 'rounded-lg'}`}
                     onClick={() => handlePartClick(idposicion)}>
                     <div
                         style={{ backgroundColor: dienteEncontrado?.condiciones_dentales.color_condicion || 'transparent' }}
@@ -104,7 +173,6 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha }
     let tieneCondicionTres = false;
 
     if (dienteConCondicionEspecial) {
-        // console.log(dienteConCondicionEspecial.idcondicionesd);
         if (dienteConCondicionEspecial.idcondicionesd === 7) {
             tieneCondicionTres = true;
         } else if (dienteConCondicionEspecial.idcondicionesd === 8) {
@@ -126,10 +194,56 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha }
 
     const dienteConIcono = dientes.length > 0 && dientes.find(diente => diente.idubicaciond === idubicacion && diente.idposiciond === 5 && (diente.idcondicionesd === 1 || diente.idcondicionesd === 2));
 
+    const iconZIndex = modal ? 0 : 1;
+
+    const iconContainerStyles = {
+        position: 'absolute',
+
+        transform: 'translate(-50%, -50%)',
+        top: '50%',
+        left: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        zIndex: iconZIndex,
+        pointerEvents: 'none',
+    };
+
+
     return (
         <div>
             <div className="w-full text-center p-1 text-xs font-bold bg-slate-300">{numero}</div>
-            <div className={`relative flex items-center justify-center w-16 h-16 ${borderColor ? borderColor : ''}`}>
+            <div className={`relative flex items-center justify-center w-16 h-16 ${borderColor ? borderColor : ''} ${estiloBorde}`}>
+                {estiloLineas == 'F' && (
+                    // una subcondicion a la variable aplicarEstilosInvertidos
+                    aplicarEstilosInvertidos ? (
+                        <div style={iconContainerStyles}>
+                            <FaGripLines style={{ pointerEvents: 'none', fontSize: '1rem', color: 'blue', width: '38px', height: '38px' }} />
+                            <FaRegSquarePlus style={{ pointerEvents: 'none', fontSize: '1.2rem', color: 'blue', marginRight: '2.5rem' }} />
+                        </div>
+                    ) :
+                        <div style={iconContainerStyles}>
+                            <FaRegSquarePlus style={{ pointerEvents: 'none', fontSize: '1.2rem', color: 'blue', marginLeft: '2.5rem' }} />
+                            <FaGripLines style={{ pointerEvents: 'none', fontSize: '1rem', color: 'blue', width: '38px', height: '38px' }} />
+                        </div>
+                )}
+                {estiloLineas == 'L' && (
+                    aplicarEstilosInvertidos ? (
+                        <div style={iconContainerStyles}>
+                            <FaRegSquarePlus style={{ pointerEvents: 'none', fontSize: '1.2rem', color: 'blue', marginLeft: '2.5rem' }} />
+                            <FaGripLines style={{ pointerEvents: 'none', fontSize: '1rem', color: 'blue', width: '38px', height: '38px' }} />
+                        </div>
+                    ) :
+                        <div style={iconContainerStyles}>
+                            <FaGripLines style={{ pointerEvents: 'none', fontSize: '1rem', color: 'blue', width: '38px', height: '38px' }} />
+                            <FaRegSquarePlus style={{ pointerEvents: 'none', fontSize: '1.2rem', color: 'blue', marginRight: '2.5rem' }} />
+                        </div>
+
+                )}
+                {estiloLineas == 'N' && (
+                    <div style={iconContainerStyles}>
+                        <FaGripLines style={{ width: '38px', height: '38px', color: 'blue', pointerEvents: 'none' }} />
+                    </div>
+                )}
                 <div className={`absolute inset-0 flex items-center justify-center`}>
                     <div className="flex flex-col items-center justify-center">
                         {renderizarParteDiente(1, 'h-3 w-8')}
@@ -153,8 +267,9 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha }
                     <CgShapeZigzag className="absolute " style={{ color: 'red', width: '50px', height: '50px', transform: 'translate(-50%, -50%) rotate(-90deg)', top: '50%', left: '50%', pointerEvents: 'none' }} />
                 )}
 
+
             </div>
-        </div>
+        </div >
     );
 
 };

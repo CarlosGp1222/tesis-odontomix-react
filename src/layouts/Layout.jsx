@@ -17,7 +17,8 @@ const customStyles = {
     bottom: 'auto',
     transform: 'translate(-50%, -50%)',
     width: '80%',
-    maxWidth: '800px'
+    maxWidth: '800px',
+    zIndex: '9999',    
   },
 };
 

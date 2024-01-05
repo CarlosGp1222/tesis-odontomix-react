@@ -8,12 +8,12 @@ import { useNavigate } from "react-router-dom";
 import MiniSpinner from './MiniSpiner';
 export default function ModalDiente() {
   const navigate = useNavigate();
-  const { handleErrorSweet, handleIngresarDatos, handleRedireccionar } = useDental();
+  const { handleErrorSweet, handleIngresarDatos, actualizar, handleEliminarDatos } = useDental();
   const fetcher = () => clienteAxios('api/tratamientos_dentales').then(datos => datos.data)
   const { data: tratamientosDatos, isLoading: isLodingTratamiento } = useSWR('api/tratamientos_dentales', fetcher)
   const fetchercondiones = () => clienteAxios('api/condiciones_dentales').then(datos => datos.data)
   const { data: condicionesDatos, isLoading: isLodingCondicion } = useSWR('api/condiciones_dentales', fetchercondiones)
-  const { datosActual, handleClickModal } = useDental();
+  const { datosActual, handleClickModal, setActualizar, handleEditarDatos } = useDental();
   const tratamientos = tratamientosDatos?.data;
   const condiciones = condicionesDatos?.data;
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -21,24 +21,19 @@ export default function ModalDiente() {
   const [seleccionador, setSeleccionador] = useState(false);
   const [ubicaciones, setUbicaciones] = useState([]);
   const [ubicacionesSeleccionadas, setUbicacionesSeleccionadas] = useState([]);
-  const [ubicacionesDientes, setUbicacionesDientes] = useState([]);
-  const [selectedUbicaciones, setSelectedUbicaciones] = useState([]);
-
 
   const { data: datosUbicaciones, isLoading: isLoadingUbicaciones } = useSWR('api/ubicacion_dental', () => clienteAxios('api/ubicacion_dental').then(res => res.data));
 
-
+  const { data: datosDientes, isLoading: isLoadingDientes } = useSWR(`api/dientes/${datosActual.idHistorial}`, () => clienteAxios('api/dientes').then(res => res.data));
 
   const handleCondicionChange = (condicion) => {
-
     setSelectedCondicion(condicion);
     setDropdownOpen(false);
   };
 
   const handleEnviarOdonto = (e) => {
-
     e.preventDefault();
-
+    let dientesUsado = false;
     const data = new FormData(e.target);
 
     if (!data.get('tratamiento') || (selectedCondicion === '' && !datosActual.idcondicionesd)) {
@@ -52,28 +47,62 @@ export default function ModalDiente() {
       idubicaciond: datosActual.idubicacion,
       idcondicionesd: selectedCondicion ? selectedCondicion : datosActual.idcondicionesd,
       idtratamientos: data.get('tratamiento'),
-      // nombre_diente: datosActual.nombre_diente,
       descripcion_diente: data.get('descripcion') != null || data.get('descripcion') != '' ? data.get('descripcion') : '',
       idhistorial: datosActual.idHistorial,
     }
 
+    let ubicacionesConDatos = [];
+
     ubicacionesSeleccionadas.forEach(ubicacion => {
-      datos.idubicaciond = ubicacion;
-      console.log(datos);
-      // handleIngresarDatos(datos, 'api/dientes');
+      const diente = datosDientes?.data.filter(d => d.idubicaciond === ubicacion && d.idposiciond === datosActual.idposiciond && d.iddiente === datosActual.idHistorial);
+      if (diente.length > 0) {
+        ubicacionesConDatos.push(diente[0]?.ubicacion_dental?.ubicacion_diente);
+        dientesUsado = true;
+      }
     });
 
-    handleIngresarDatos(datos, 'api/dientes', true);
+    // console.log(dientesUsado && !datosActual?.datosDiente);
+    if (dientesUsado && !datosActual?.datosDiente) {
+      const ubicacionesString = ubicacionesConDatos.join(', ');
+      handleErrorSweet(`Los dientes ${ubicacionesString} ya tiene registro registrado`);
+      return;
+    }
+
+    ubicacionesSeleccionadas.forEach(ubicacion => {
+      datos.idubicaciond = ubicacion;
+      if (datosActual?.datosDiente) {
+        let idParaURL = `${datosActual.idHistorial}/${datosActual.idposiciond}/${datosActual.idubicacion}`;
+        handleEditarDatos(idParaURL, datos, 'api/dientes');
+      }else{
+        handleIngresarDatos(datos, 'api/dientes', false);
+      }
+    });
+    
+    setTimeout(() => {
+      setActualizar(!actualizar);
+    }, 1500);
+
+
   }
-
-
 
   useEffect(() => {
     if (datosUbicaciones) {
+      setSelectedCondicion(datosActual.idcondicionesd);
       setUbicaciones(datosUbicaciones.data);
       setUbicacionesSeleccionadas([datosActual.idubicacion]);
     }
   }, [datosUbicaciones]);
+
+  // if (isLoadingUbicaciones || isLoadingDientes) return <MiniSpinner />
+
+  const handleElimimarDiente = () => {
+    const idParaURL = `${datosActual.idHistorial}/${datosActual.idposiciond}/${datosActual.idubicacion}`; 
+    handleEliminarDatos(idParaURL, 'api/dientes');
+    setTimeout(() => {
+      setActualizar(!actualizar);
+    }, 1000);
+    handleClickModal();
+  };
 
   const obtenerDientesAdyacentes = (numDiente, ubicaciones) => {
     const numDienteInt = parseInt(numDiente);
@@ -88,36 +117,41 @@ export default function ModalDiente() {
 
 
   useEffect(() => {
-    if (selectedCondicion === 9 || selectedCondicion === 10 || selectedCondicion === 11) {
+    if ((selectedCondicion === 9 || selectedCondicion === 10 || selectedCondicion === 11) && datosActual.idposiciond === 5) {
       setSeleccionador(true);
       const adyacentes = obtenerDientesAdyacentes(datosActual.numDiente, datosUbicaciones.data);
       setUbicacionesSeleccionadas([datosActual.idubicacion, ...adyacentes]);
     } else {
       setSeleccionador(false);
+      setUbicacionesSeleccionadas([datosActual.idubicacion]);
     }
-  }, [selectedCondicion, ubicaciones, datosActual.numDiente]);
+  }, [selectedCondicion, datosActual.idposiciond, datosActual.numDiente, datosUbicaciones.data]);
 
   const obtenerRango = (numDiente) => {
-    if (numDiente >= 11 && numDiente <= 18) return [11, 12, 13, 14, 15, 16, 17, 18];
+    if (numDiente >= 11 && numDiente <= 18) return [18, 17, 16, 15, 14, 13, 12, 11];
     if (numDiente >= 51 && numDiente <= 55) return [51, 52, 53, 54, 55];
     if (numDiente >= 21 && numDiente <= 28) return [21, 22, 23, 24, 25, 26, 27, 28];
     if (numDiente >= 61 && numDiente <= 65) return [61, 62, 63, 64, 65];
-    if (numDiente >= 81 && numDiente <= 85) return [81, 82, 83, 84, 85];
-    if (numDiente >= 41 && numDiente <= 48) return [41, 42, 43, 44, 45, 46, 47, 48];
+    if (numDiente >= 81 && numDiente <= 85) return [85, 84, 83, 82, 81];
+    if (numDiente >= 41 && numDiente <= 48) return [48, 47, 46, 45, 44, 43, 42, 41];
     if (numDiente >= 71 && numDiente <= 75) return [71, 72, 73, 74, 75];
     if (numDiente >= 31 && numDiente <= 38) return [31, 32, 33, 34, 35, 36, 37, 38];
   };
 
   const checkboxesDientes = () => {
-    if (!seleccionador || !ubicaciones.length) return null;
+    if (!seleccionador || !ubicaciones.length || datosActual?.datosDiente) return null;
 
     const rangoNumDientes = obtenerRango(datosActual.numDiente);
     if (!rangoNumDientes) return null;
-    const rangoUbicaciones = ubicaciones?.filter(ubicacion => rangoNumDientes.includes(ubicacion.ubicacion_diente)) || [];
+
+    let rangoUbicaciones = ubicaciones.filter(ubicacion => rangoNumDientes.includes(ubicacion.ubicacion_diente));
+
+    if (rangoUbicaciones.some(ubicacion => ubicacion.ubicacion_diente == 18 || ubicacion.ubicacion_diente == 55 || ubicacion.ubicacion_diente == 85 || ubicacion.ubicacion_diente == 48 || ubicacion.ubicacion_diente == 75 || ubicacion.ubicacion_diente == 38)) {
+      rangoUbicaciones.sort((a, b) => b.ubicacion_diente - a.ubicacion_diente);
+    }
 
     return rangoUbicaciones.map(ubicacion => (
-      <label key={ubicacion.idubicaciond} className={` flex flex-col justify-center items-center ${datosActual.idubicacion === ubicacion.idubicaciond ? 'border-b-2 text-center border-indigo-900' : ''}`}>
-
+      <label key={ubicacion.idubicaciond} className={`flex flex-col justify-center items-center ${datosActual.idubicacion === ubicacion.idubicaciond ? 'border-b-2 text-center border-indigo-900' : ''}`}>
         <input
           className={`${datosActual.idubicacion === ubicacion.idubicaciond ? 'hidden' : ''}`}
           type="checkbox"
@@ -130,6 +164,7 @@ export default function ModalDiente() {
     ));
   };
 
+
   const handleCheckboxChange = (idUbicacion) => {
     setUbicacionesSeleccionadas(prev => {
       if (prev.includes(idUbicacion)) {
@@ -141,7 +176,7 @@ export default function ModalDiente() {
   };
 
   return (
-    <div className='p-4 overflow-visible'>
+    <div className='p-4 overflow-visible z-50'>
 
       <div>
         <button className="float-right focus:outline-none" onClick={handleClickModal}>
@@ -149,7 +184,7 @@ export default function ModalDiente() {
         </button>
       </div>
 
-      <form onSubmit={handleEnviarOdonto} >
+      <form onSubmit={handleEnviarOdonto} className='z-40'>
         <div className="bg-white p-4 rounded grid grid-cols-2 gap-4">
           <div className='border-r flex items-center flex-col justify-center'>
             <h2 className="text-center text-2xl text-cyan-600 flex justify-center items-center gap-4"><PiTooth size={50} /> Diente #{datosActual.numDiente}</h2>
@@ -223,7 +258,7 @@ export default function ModalDiente() {
               </div>
             </div>
             <div>
-              {seleccionador && datosActual?.idposiciond == 5 && (
+              {seleccionador && datosActual?.idposiciond == 5 && !datosActual?.datosDiente && (
                 <div className='gap-4 mt-2 flex flex-col'>
                   <label className="block text-gray-700 text-sm font-bold">
                     Dientes: <span className="text-red-500">*</span>
@@ -241,7 +276,7 @@ export default function ModalDiente() {
             <span className="mr-2">{datosActual?.datosDiente ? 'Guardar Cambios' : 'Guardar'}</span>
           </button>
           {datosActual?.datosDiente && (
-            <button type="button" className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded flex items-center mt-4">
+            <button onClick={() => handleElimimarDiente()} type="button" className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded flex items-center mt-4">
               <span className="mr-2">Eliminar</span>
             </button>
           )

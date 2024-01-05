@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react'
+import { useMemo, createContext, useEffect, useState, } from 'react'
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 
@@ -14,6 +14,8 @@ const DentalProvider = ({ children }) => {
     const [refresh, setRefresh] = useState(false);
     const [datosPosicion, setDatosPosicion] = useState({});
     const [dientes, setDientes] = useState({});
+    const [actualizar, setActualizar] = useState(false);
+    const [actualizarId, setActualizarId] = useState(false);
 
     const handleClickModal = () => {
         if (modal === true) {
@@ -61,7 +63,8 @@ const DentalProvider = ({ children }) => {
         }
     }
 
-    const handleSubmitHistorial = async (arrayEnfermedades, Preguntas, Examenes, idPaciente, idConsulta, navigate) => {
+    const handleSubmitHistorial = async (arrayEnfermedades, Preguntas, Examenes, idPaciente, idConsulta, navigate, inputExamenIntraoral, idconsulta, archivo) => {
+        let c = 0;
         try {
             if (arrayEnfermedades.length > 0) {
                 for (let index = 0; index < arrayEnfermedades.length; index++) {
@@ -78,19 +81,60 @@ const DentalProvider = ({ children }) => {
 
             const { data: datosPreguntas } = await clienteAxios.post(`api/preguntas`, Preguntas);
             const { data: datosExamenes } = await clienteAxios.post(`api/examen_extraoral`, Examenes);
+            const { data: datosExamenIntraoral } = await clienteAxios.post(`api/examen_intraoral`, inputExamenIntraoral);
 
-            const DatosHistorial = {
-                idpaciente: idPaciente,
-                idconsulta: idConsulta,
-                idenfermedad_paciente: arrayEnfermedades.length > 0 ? idConsulta : '',
-                idpregunta: datosPreguntas?.data?.idpreguntas ? datosPreguntas?.data?.idpreguntas : '',
-                idexamen_extraoral: datosExamenes.data.idextraoral ? datosExamenes.data.idextraoral : '',
-                estado_historial: 0,
+
+
+            // const DatosHistorial = {
+            //     idpaciente: idPaciente,
+            //     idconsulta: idConsulta,
+            //     idenfermedad_paciente: arrayEnfermedades.length > 0 ? idConsulta : '',
+            //     idpregunta: datosPreguntas?.data?.idpreguntas ? datosPreguntas?.data?.idpreguntas : '',
+            //     idexamen_extraoral: datosExamenes.data.idextraoral ? datosExamenes.data.idextraoral : '',
+            //     estado_historial: 0,
+            //     idexamen_intraoral: datosExamenIntraoral.data.idintraoral ? datosExamenIntraoral.data.idintraoral : '',
+            // }
+            // // console.log(DatosHistorial);
+            // const { data: historial } = await clienteAxios.post(`api/historial_medico`, DatosHistorial);
+
+            let formData = new FormData();
+            console.log(c++);
+            formData.append('idpaciente', idPaciente);
+            formData.append('idconsulta', idConsulta);
+            formData.append('idenfermedad_paciente', arrayEnfermedades.length > 0 ? idConsulta : '');
+            formData.append('idpregunta', datosPreguntas?.data?.idpreguntas ? datosPreguntas?.data?.idpreguntas : '');
+            formData.append('idexamen_extraoral', datosExamenes.data.idextraoral ? datosExamenes.data.idextraoral : '');
+            formData.append('idexamen_intraoral', datosExamenIntraoral.data.idintraoral ? datosExamenIntraoral.data.idintraoral : '');
+            formData.append('estado_historial', 0);
+            formData.append('radiografia_historial', archivo);
+
+            // Enviar los datos y el archivo
+            const response = await clienteAxios.post('api/historial_medico', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            console.log(response.data.data.numero_ficha);
+
+            const estado_consulta = {
+                estado_consulta: 1
             }
-            console.log(DatosHistorial);
-            const { data: historial } = await clienteAxios.post(`api/historial_medico`, DatosHistorial);
+
+            // let formData = new FormData();
+            // formData.append('radiografia_historial', archivo);
+            // formData.append('id_historial', historial?.data?.idhistorial); // Suponiendo que necesitas pasar el ID del historial
+
+            // handleEditarDatos(idconsulta, estado_consulta, `api/consultas`, false);
+
+            // const response = await clienteAxios.post('api/radiografia', formData, {
+            //     headers: {
+            //         'Content-Type': 'multipart/form-data'
+            //     }
+            // });
+
             toast.info(`Datos ingresados correctamente`);
-            navigate(`/odontograma/creacion-odontograma/${historial.data.numero_ficha}`)
+            navigate(`/odontograma/creacion-odontograma/${response.data.data.numero_ficha}`)
         } catch (error) {
 
             console.log(error);
@@ -141,17 +185,24 @@ const DentalProvider = ({ children }) => {
         }
     }
 
-    const handleIngresarDatos = async (datos, url, reinicio = false) => {
+    const handleIngresarDatos = async (datos, url, reinicio = false, alerta = true) => {
         try {
-            console.log(datos);
-            const { data } = await clienteAxios.post(`${url}`, datos);
-            toast.info(`Datos ingresados correctamente`);
-            handleClickModal();
-            mutate(url);
-            if (reinicio) {
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
+            // console.log(datos);
+            if (alerta) {
+                const { data } = await clienteAxios.post(`${url}`, datos);
+                toast.info(`Datos ingresados correctamente`);
+                handleClickModal();
+                mutate(url);
+                if (reinicio) {
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                }
+            } else {
+                const { data } = await clienteAxios.post(`${url}`, datos);
+                toast.info(`Datos ingresados correctamente`);
+                handleClickModal();
+                mutate(url);
             }
         } catch (error) {
             // console.log(error.response.data.errors);
@@ -178,53 +229,118 @@ const DentalProvider = ({ children }) => {
         return mensajesError;
     }
 
-    const handleEditarDatos = (id, usr, url) => {
+    // const handleEditarDatos = (id, usr, url, alerta = true) => {
+    //     try {
+    //         if (alerta) {
+    //             Swal.fire({
+    //                 title: `Desea actualizar informacion?`,
+    //                 showDenyButton: true,
+    //                 showCancelButton: true,
+    //                 confirmButtonText: 'Save',
+    //                 denyButtonText: `Don't save`,
+    //             }).then(async (result) => {
+    //                 if (result.isConfirmed) {
+    //                     try {
+
+    //                         const { data } = await clienteAxios.put(`${url}/${id}`, usr);
+    //                         mutate(url);
+    //                         setRefresh(!refresh);
+    //                         Swal.fire('Cambios Guardados!', '', 'success')
+    //                         toast.info(`Datos actualizado correctamente`);
+    //                         handleClickModal();
+
+    //                     } catch (error) {
+    //                         console.log(error?.response?.data?.errors);
+    //                         const mensajesError = handleErrores(error);
+    //                         Swal.fire({
+    //                             icon: 'error',
+    //                             title: 'Oops...',
+    //                             text: mensajesError[0]
+    //                         })
+    //                     }
+
+    //                 } else if (result.isDenied) {
+    //                     Swal.fire('No se guardaron los cambios', '', 'info')
+    //                     handleClickModal();
+    //                 }
+
+    //             })
+    //         } else {
+    //             try {
+    //                 async () => {
+    //                     const { data } = await clienteAxios.put(`${url}/${id}`, usr);
+    //                     mutate(url);
+    //                     setRefresh(!refresh);
+    //                     Swal.fire('Cambios Guardados!', '', 'success')
+    //                     toast.info(`Datos actualizado correctamente`);
+    //                     handleClickModal();
+    //                 }
+    //             } catch (error) {
+    //                 console.log(error?.response?.data?.errors);
+    //                 const mensajesError = handleErrores(error);
+    //                 Swal.fire({
+    //                     icon: 'error',
+    //                     title: 'Oops...',
+    //                     text: mensajesError[0]
+    //                 })
+    //             }
+    //         }
+
+    //     } catch (error) {
+    //         console.log(error?.response?.data?.errors);
+    //         const mensajesError = handleErrores(error);
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Oops...',
+    //             text: mensajesError[0]
+    //         })
+    //     }
+    // }
+
+    const handleEditarDatos = async (id, usr, url, alerta = true) => {
+        const actualizarDatos = async () => {
+            try {
+                const { data } = await clienteAxios.put(`${url}/${id}`, usr);
+                mutate(url);
+                setRefresh((prevRefresh) => !prevRefresh);
+                Swal.fire('Cambios Guardados!', '', 'success');
+                toast.info(`Datos actualizado correctamente`);
+                handleClickModal();
+            } catch (error) {
+                console.error(error?.response?.data?.errors);
+                const mensajesError = handleErrores(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: mensajesError[0]
+                });
+            }
+        };
+
         try {
+            if (alerta) {
+                const result = await Swal.fire({
+                    title: `Desea actualizar información?`,
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Save',
+                    denyButtonText: `Don't save`,
+                });
 
-            Swal.fire({
-                title: `Desea actualizar informacion?`,
-                showDenyButton: true,
-                showCancelButton: true,
-                confirmButtonText: 'Save',
-                denyButtonText: `Don't save`,
-            }).then(async (result) => {
-                /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {
-                    try {
-
-                        const { data } = await clienteAxios.put(`${url}/${id}`, usr);
-                        mutate(url);
-                        setRefresh(!refresh);
-                        Swal.fire('Cambios Guardados!', '', 'success')
-                        toast.info(`Datos actualizado correctamente`);
-                        handleClickModal();
-
-                    } catch (error) {
-                        console.log(error?.response?.data?.errors);
-                        const mensajesError = handleErrores(error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: mensajesError[0]
-                        })
-                    }
-
+                    await actualizarDatos();
                 } else if (result.isDenied) {
-                    Swal.fire('No se guardaron los cambios', '', 'info')
+                    Swal.fire('No se guardaron los cambios', '', 'info');
                     handleClickModal();
                 }
-
-            })
+            } else {
+                await actualizarDatos();
+            }
         } catch (error) {
-            console.log(error?.response?.data?.errors);
-            const mensajesError = handleErrores(error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: mensajesError[0]
-            })
+            console.error(error);
+            // Manejo adicional de errores si es necesario
         }
-    }
+    };
 
     const handleErrorSweet = (valor) => {
         Swal.fire({
@@ -288,7 +404,11 @@ const DentalProvider = ({ children }) => {
                 handleErrorSweet,
                 dientes,
                 handleDientes,
-                handleRedireccionar
+                handleRedireccionar,
+                actualizar,
+                setActualizar,
+                actualizarId,
+                setActualizarId,
             }}
         >
             {children}

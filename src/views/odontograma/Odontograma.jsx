@@ -4,56 +4,169 @@ import Diente from './Diente';
 import useSWR, { mutate } from 'swr'
 import clienteAxios from "../../config/axios";
 import Spinner from '../../components/Spinner';
+import { FaSearch } from "react-icons/fa";
 import useDental from '../../hooks/useDental';
 import { useParams } from 'react-router-dom';
 
 export default function odontograma() {
-    const { handleTipoModal, handleDientes } = useDental();
+    const { handleTipoModal, handleDientes, actualizar, actualizarId } = useDental();
     const { idHistorial } = useParams();
 
     const [datosId, setDatosId] = useState({});
+    const [odontograma, setOdontograma] = useState(null);
+    const [consultarAPI, setConsultarAPI] = useState(true); // Controla si se debe consultar la API
+    const [pacientes, setPacientes] = useState([]); // Almacena los pacientes obtenidos de la API
+    const [pacienteSeleccionado, setPacienteSeleccionado] = useState(''); // Almacena el paciente seleccionado en el input
+    const [noExistePaciente, setNoExistePaciente] = useState(false);
 
     const fetcherHisto = url => clienteAxios(url).then(res => res.data);
-    const { data: datosHistorial, error, isLoading: isLoadingDatosHistorial } = useSWR(idHistorial ? `api/historial_medico/${idHistorial}` : null, fetcherHisto);
+
+    const { data: datosHistorial, isLoading: isLoadingDatosHistorial, error } = useSWR(consultarAPI && idHistorial ? `api/historial_medico/${idHistorial}` : null, fetcherHisto);
+
+
+    const { data: dataPaciente, error: errorPaciente, isLoading: isLoadingPaciente } = useSWR('api/pacientes', url => clienteAxios(url).then(res => res.data));
+    // const { data: dataPaciente } = useSWR('api/pacientes', fetcherPaciente);
+
+    // const obtenerPacientes = async () => {
+    //     try {
+    //         const fetcherPaciente = () => clienteAxios('api/pacientes').then(datos => datos.data);
+    //         const { data: dataPaciente } = useSWR('api/pacientes', fetcherPaciente);
+    //         setPacientes(dataPaciente.data); // Ajusta según la estructura de tu respuesta
+    //     } catch (error) {
+    //         console.error('Error al obtener pacientes:', error);
+    //     }
+    // };
+
+    const handlePacienteChange = (e) => {
+        const identificacion = e.target.value;
+        setPacienteSeleccionado(identificacion);
+
+        const pacienteExiste = dataPaciente?.data.some(paciente => paciente.identificacion_paciente === identificacion);
+        setNoExistePaciente(!pacienteExiste);
+    };
+
+
+    const fetcher = () => clienteAxios('api/ubicacion_dental').then(datos => datos.data)
+    const { data: Datosdientes, isLoading } = useSWR('api/ubicacion_dental', fetcher)
+
+    const dientes = Datosdientes?.data || null;
+
+    const funcionDeclaramiento = () => {
+
+        if (!dientes || dientes.length === 0) {
+            return <p>No hay dientes para mostrar.</p>; // Devuelve un mensaje o componente vacío
+        }
+
+        const renderizarDientes = (rangoInicio, rangoFin) => {
+            let dientesFiltrados = dientes
+                .filter(diente => diente.ubicacion_diente >= Math.min(rangoInicio, rangoFin) && diente.ubicacion_diente <= Math.max(rangoInicio, rangoFin));
+
+            // console.log(dientesFiltrados);
+            if (rangoInicio > rangoFin) {
+                dientesFiltrados = dientesFiltrados.sort((a, b) => b.ubicacion_diente - a.ubicacion_diente);
+            } else {
+                dientesFiltrados = dientesFiltrados.sort((a, b) => a.ubicacion_diente - b.ubicacion_diente);
+            }
+
+            return dientesFiltrados.map(diente => (
+                <Diente
+                    key={diente.idubicaciond}
+                    numero={diente.ubicacion_diente}
+                    idHistorial={datosId}
+                    idubicacion={diente.idubicaciond}
+                    nombre_diente={diente.nombre_diente}
+                    numeroFicha={idHistorial}
+                    idhemisferio_diente={diente.idhemisferio_diente}
+                />
+            ));
+        };
+
+        return (
+            <div className="flex flex-wrap justify-around mt-2">
+                <div className="flex flex-col">
+                    <div className="flex justify-center mb-2">{renderizarDientes(18, 11)}</div>
+                    <div className="flex justify-end md:justify-center">{renderizarDientes(55, 51)}</div>
+                </div>
+                <div className="flex flex-col">
+                    <div className="flex justify-center mb-2">{renderizarDientes(21, 28)}</div>
+                    <div className="flex justify-start md:justify-center">{renderizarDientes(61, 65)}</div>
+                </div>
+                <div className="flex flex-col">
+                    <div className="flex  justify-end mb-2 md:justify-center">{renderizarDientes(85, 81)}</div>
+                    <div className="flex justify-center">{renderizarDientes(48, 41)}</div>
+                </div>
+                <div className="flex flex-col">
+                    <div className="flex justify-start mb-2 md:justify-center">{renderizarDientes(71, 75)}</div>
+                    <div className="flex justify-center ">{renderizarDientes(31, 38)}</div>
+                </div>
+            </div>
+        );
+    }
+
+
 
     useEffect(() => {
         handleTipoModal('odontograma');
-        if (datosHistorial && datosHistorial.data.idhistorial) {
+        if (datosHistorial && datosHistorial.data && datosHistorial.data.idhistorial) {
             setDatosId(datosHistorial.data.idhistorial);
-            handleDientes(datosHistorial?.data?.idhistorial, 'api/dientes');
-            refrescarDientes();
+            handleDientes(datosHistorial.data.idhistorial, 'api/dientes');
+            setOdontograma(funcionDeclaramiento());
+
+        } else if (error) {
+            setConsultarAPI(false); // Desactiva consultas adicionales si hay un error
         }
-    }, [datosHistorial]);
+        // obtenerPacientes();
 
-    const refrescarDientes = () => {
-        mutate();
-    };    
+        // if (datosHistorial && datosHistorial.data.idhistorial) {
+        //     setDatosId(datosHistorial.data.idhistorial);
+        //     handleDientes(datosHistorial?.data?.idhistorial, 'api/dientes');            
 
-    
+        // }
+    }, [datosHistorial, isLoading, actualizar, actualizarId, datosId, isLoadingDatosHistorial]);
 
-    const fetcher = () => clienteAxios('api/ubicacion_dental').then(datos => datos.data)
-    const { data: Datosdientes, isLoading, mutate } = useSWR('api/ubicacion_dental', fetcher)
-
-    const dientes = Datosdientes?.data;
     const datosPaciente = datosHistorial?.data?.paciente;
 
-    if (isLoading || isLoadingDatosHistorial) return <Spinner />
+    if (isLoading || isLoadingDatosHistorial || isLoadingPaciente) return <Spinner />
 
-    const renderizarDientes = (rangoInicio, rangoFin) => dientes
-        .filter(diente => diente.ubicacion_diente >= rangoInicio && diente.ubicacion_diente <= rangoFin)
-        .map(diente => <Diente key={diente.ubicacion_diente} numero={diente.ubicacion_diente} idHistorial={datosId} idubicacion={diente.idubicaciond} nombre_diente={diente.nombre_diente} numeroFicha={idHistorial} />);
-
-
+    const handleBuscaNumero = (e) => {
+        e.preventDefault();
+        const idPaciente = dataPaciente.data.find(paciente => paciente.identificacion_paciente === pacienteSeleccionado)?.idpaciente;
+        console.log(idPaciente);
+    }   
 
     return (
         <div className='mt-5'>
             <div className="flex justify-center items-center gap-4">
                 <div className="flex items-center gap-4">
                     <MdOutlineContentPasteSearch size={24} />
-                    <input type="text" placeholder="Buscar por identidad" className="border border-gray-400 rounded-lg p-2 focus:outline-none" />
+                    <input
+                        list="pacientes"
+                        value={pacienteSeleccionado}
+                        placeholder="Escribe la identificación del paciente"
+                        onChange={handlePacienteChange}
+                        className={`shadow appearance-none border ${noExistePaciente ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+                    />
+                    {noExistePaciente && (
+                        <p className="text-red-500 text-xs italic">
+                            El paciente no existe, por favor ingrese un paciente válido
+                        </p>
+                    )}
+                    <datalist id="pacientes">
+                        {dataPaciente.data?.map(paciente => (
+                            <option key={paciente.idpaciente} value={paciente.identificacion_paciente}>
+                                {paciente.identificacion_paciente} - {paciente.nombre_paciente} {paciente.apellidos_paciente}
+                            </option>
+                        ))}
+                    </datalist>
+                </div>
+                {/* boton de buscar */}
+                <div>
+                    <button onClick={handleBuscaNumero} className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
+                        <FaSearch />
+                    </button>
                 </div>
             </div>
-            <div className='w-full flex flex-col bg-slate-300 justify-between p-4 mt-4 md:flex-row'>
+            <div className='w-full flex flex-col justify-between p-4 mt-4 md:flex-row'>{/* bg-slate-300 */}
                 <div className='w-1/2'>
                     <h2 className='font-bold'>Nombre: <span className='font-normal'>{(datosPaciente?.nombre_paciente ? datosPaciente.nombre_paciente : 'Sin datos') + " " + (datosPaciente?.apellidos_paciente ? datosPaciente.apellidos_paciente : '')}</span></h2>
                 </div>
@@ -61,7 +174,8 @@ export default function odontograma() {
                     <h2 className='font-bold'>Identificación: <span className='font-normal'>{datosPaciente?.identificacion_paciente ? datosPaciente?.identificacion_paciente : 'Sin datos'}</span></h2>
                 </div>
             </div>
-            <div className='w-full flex flex-col bg-slate-300 justify-between p-4 md:flex-row'>
+
+            <div className='w-full flex flex-col   justify-between p-4 md:flex-row'>{/* bg-slate-300 */}
                 <div className='w-1/2'>
                     <h2 className='font-bold'>Edad: <span className='font-normal'>{datosPaciente?.edad_paciente ? datosPaciente?.edad_paciente : 'Sin datos'}</span></h2>
                 </div>
@@ -69,31 +183,24 @@ export default function odontograma() {
                     <h2 className='font-bold'>Genero: <span className='font-normal'>{datosPaciente?.genero_paciente == 'M' ? 'Masculino' : (datosPaciente?.genero_paciente == 'F' ? 'Femenino' : 'Sin Datos')}</span></h2>
                 </div>
             </div>
-            <div className='w-full flex flex-col bg-slate-300 justify-between p-4 md:flex-row'>
+            <div className='w-full flex flex-col justify-between p-4 md:flex-row'>{/* bg-slate-300 */}
                 <div className='w-1/2'>
-                    <h2 className='font-bold'>Altura: <span className='font-normal'>{datosPaciente?.altura_paciente ? datosPaciente?.altura_paciente + ' M' : 'Sin datos'}</span></h2>
+                    <h2 className='font-bold '>Altura: <span className='font-normal'>{datosPaciente?.altura_paciente ? datosPaciente?.altura_paciente + ' M' : 'Sin datos'}</span></h2>
                 </div>
                 <div className='w-1/2'>
                     <h2 className='font-bold'>Peso: <span className='font-normal'>{datosPaciente?.peso_paciente ? datosPaciente?.peso_paciente + ' Kg' : 'Sin datos'}</span></h2>
                 </div>
             </div>
+            {odontograma}
 
-            <div className="flex flex-wrap justify-around mt-2">
-                <div className="flex flex-col">
-                    <div className="flex justify-center mb-2">{renderizarDientes(11, 18)}</div>
-                    <div className="flex justify-end md:justify-center">{renderizarDientes(51, 55)}</div>
+            <div className='mt-10 flex flex-1 justify-center'>
+                <div>
+
                 </div>
-                <div className="flex flex-col">
-                    <div className="flex justify-center mb-2">{renderizarDientes(21, 28)}</div>
-                    <div className="flex justify-center">{renderizarDientes(61, 65)}</div>
-                </div>
-                <div className="flex flex-col">
-                    <div className="flex justify-center mb-2">{renderizarDientes(81, 85)}</div>
-                    <div className="flex justify-center">{renderizarDientes(41, 48)}</div>
-                </div>
-                <div className="flex flex-col">
-                    <div className="flex justify-center mb-2">{renderizarDientes(71, 75)}</div>
-                    <div className="flex justify-center">{renderizarDientes(31, 38)}</div>
+                <div>
+                    <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
+                        Guardar odontograma
+                    </button>
                 </div>
             </div>
         </div>
