@@ -362,6 +362,7 @@ const DentalProvider = ({ children }) => {
         }).then((result) => {
             if (result.isConfirmed) {
                 clienteAxios.delete(`${url}/${id}`);
+                mutate(url);
                 Swal.fire(
                     'Eliminado!',
                     'Los datos fueron eliminados con exito.',
@@ -382,10 +383,24 @@ const DentalProvider = ({ children }) => {
         }
     }
 
+    const handleEnvioMail = async (datos) => {
+        try {
+            console.log(datos);
+            
+            await clienteAxios.post(`api/envioCorreo`, datos);
+            toast.info(`Correo enviado correctamente`);
+            // setDientes(data.data);
+        } catch (error) {
+            console.log(error);
+            setDientes({});
+        }
+    }
+
     return (
         <DentalContext.Provider
             value={{
                 modal,
+                handleEnvioMail,
                 handleClickModal,
                 handleGetDatos,
                 handleIngresarDatos,

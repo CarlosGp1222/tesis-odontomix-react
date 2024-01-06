@@ -7,11 +7,11 @@ import { formatearFechaSinHora, formatearHora } from "../../helpers";
 import { FaPlus } from "react-icons/fa";
 
 export default function VistaCitas() {
-    const { handleTipoModal, handleClickModal, handleDatosActual, handleCompletarCita } = useDental();
+    const { handleTipoModal, handleClickModal, handleDatosActual, handleCompletarCita, handleEliminarDatos } = useDental();
     const [citas, setCitas] = useState([]);
 
     const fetcher = () => clienteAxios('api/citas').then(datos => datos.data);
-    const { data, error,isLoading } = useSWR('api/citas', fetcher);
+    const { data, error, isLoading } = useSWR('api/citas', fetcher);
 
     useEffect(() => {
         handleTipoModal('citas');
@@ -19,6 +19,11 @@ export default function VistaCitas() {
             setCitas(data.data);
         }
     }, [data, error]);
+
+
+    const handleEliminarCita = (id) => {
+        handleEliminarDatos(id, 'api/citas');
+    };
 
 
     if (isLoading) return <Spinner />
@@ -70,7 +75,7 @@ export default function VistaCitas() {
                                             >
                                                 {isPending ? 'Completar' : 'Ver consulta'}
                                             </button>
-                                            <button className={`bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded ${isPending ? '' : 'hidden'}`}>
+                                            <button onClick={()=>handleEliminarCita(cita.idcita)} className={`bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded ${isPending ? '' : 'hidden'}`}>
                                                 Eliminar
                                             </button>
                                         </div>

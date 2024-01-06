@@ -6,7 +6,7 @@ import { FaTimes } from "react-icons/fa";
 import { formatearFechaSinHora, formatearHora } from "../helpers";
 
 export default function CitasModal() {
-  const { handleTipoModal, handleClickModal, handleIngresarDatos, datosActual, handleEditarDatos } = useDental();
+  const { handleTipoModal, handleClickModal, handleIngresarDatos, datosActual, handleEditarDatos, handleEnvioMail } = useDental();
   const [clientes, setClientes] = useState([]);
   const [pacientes, setPacientes] = useState([]);
   const [inputCliente, setInputCliente] = useState('');
@@ -79,8 +79,9 @@ export default function CitasModal() {
       console.log(data);
       if (datosActual.idcita != null) {
         handleEditarDatos(datosActual.idcita, data, 'api/citas');
-      } else {
+      } else {        
         handleIngresarDatos(data, 'api/citas');
+        handleEnvioMail(data);
       }
     }
   };
