@@ -20,10 +20,6 @@ export default function Historial_medico() {
         }
     }, [data]);
 
-
-
-
-
     if (isLoading) return <Spinner />
 
     const handelEnviarAhistorial = (historial_medico) => {

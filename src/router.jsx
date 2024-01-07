@@ -98,7 +98,7 @@ const router = createBrowserRouter([
                 element: <Historial_medico />,
             },
             {
-                path: '/historial/historial-completo',
+                path: '/historial/historial-completo/',
                 element: <Historial_completo />,
             }
         ],

@@ -61,7 +61,7 @@ export default function FormularioHistorialM() {
         idexamen_oclusion: '',
     });
 
-    
+
 
 
     const fetchData = async () => {
@@ -98,7 +98,7 @@ export default function FormularioHistorialM() {
 
     // Función para manejar los cambios de los inputs
 
-    const { handleSubmitHistorial } = useDental();
+    const { handleSubmitHistorial, handleErrorSweet } = useDental();
 
     const idconsulta = localStorage.getItem('IDCONSULTA');
     const [selectedDiseases, setSelectedDiseases] = useState([]);
@@ -160,27 +160,30 @@ export default function FormularioHistorialM() {
     // console.log(step);
     const nextStep = () => {
         if (!isAllDiseasesFilled()) {
-            alert("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
+            handleErrorSweet("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
             return;
         }
         if (step == 2) {
-
             if (complications && !preguntaComplicaciones?.current?.value?.trim()) {
+                handleErrorSweet("Complete las pereguntas seleccionadas");
                 return;
             } else {
                 setInputComplicaciones(preguntaComplicaciones?.current?.value?.trim());
             }
             if (beingTreated && !preguntaTratamiento?.current?.value?.trim()) {
+                handleErrorSweet("Complete las pereguntas seleccionadas");
                 return;
             } else {
                 setInputTratamiento(preguntaTratamiento?.current?.value?.trim());
             }
             if (takingMedication && !preguntaMedicamentos?.current?.value?.trim()) {
+                handleErrorSweet("Complete las pereguntas seleccionadas");
                 return;
             } else {
                 setInputMedicamentos(preguntaMedicamentos?.current?.value?.trim());
             }
             if (allergic && !preguntaAlergias?.current?.value?.trim()) {
+                handleErrorSweet("Complete las pereguntas seleccionadas");
                 return;
             } else {
                 setInputAlergias(preguntaAlergias?.current?.value?.trim());
@@ -191,27 +194,30 @@ export default function FormularioHistorialM() {
 
     const prevStep = () => {
         if (!isAllDiseasesFilled()) {
-            alert("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
+            handleErrorSweet("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
             return;
         }
         if (step == 2) {
-
             if (complications && !preguntaComplicaciones?.current?.value?.trim()) {
+                handleErrorSweet("Complete las pereguntas seleccionadas");
                 return;
             } else {
                 setInputComplicaciones(preguntaComplicaciones?.current?.value?.trim());
             }
             if (beingTreated && !preguntaTratamiento?.current?.value?.trim()) {
+                handleErrorSweet("Complete las pereguntas seleccionadas");
                 return;
             } else {
                 setInputTratamiento(preguntaTratamiento?.current?.value?.trim());
             }
             if (takingMedication && !preguntaMedicamentos?.current?.value?.trim()) {
+                handleErrorSweet("Complete las pereguntas seleccionadas");
                 return;
             } else {
                 setInputMedicamentos(preguntaMedicamentos?.current?.value?.trim());
             }
             if (allergic && !preguntaAlergias?.current?.value?.trim()) {
+                handleErrorSweet("Complete las pereguntas seleccionadas");
                 return;
             } else {
                 setInputAlergias(preguntaAlergias?.current?.value?.trim());
@@ -315,8 +321,6 @@ export default function FormularioHistorialM() {
 
             <section className="mb-8 p-6 bg-white shadow rounded">
                 <h2 className="text-xl font-semibold mb-6 text-gray-800">Historial Médico</h2>
-
-                {/* Pregunta sobre complicaciones */}
                 <div className="mb-4">
                     <label className="block text-gray-700 font-bold mb-2">Ha presentado complicaciones?</label>
                     <div className="flex items-center mb-4">
@@ -330,7 +334,7 @@ export default function FormularioHistorialM() {
                             <input
                                 defaultValue={inputCompliaciones}
                                 onBlur={(e) => setInputComplicaciones(e.target.value)}
-                                ref={preguntaComplicaciones} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required
+                                ref={preguntaComplicaciones} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             />
                         </div>
                     )}
@@ -349,7 +353,7 @@ export default function FormularioHistorialM() {
                             <input
                                 defaultValue={inputTratamineto}
                                 onBlur={(e) => setInputTratamiento(e.target.value)}
-                                ref={preguntaTratamiento} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
+                                ref={preguntaTratamiento} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                         </div>
                     )}
                 </div>
@@ -367,7 +371,7 @@ export default function FormularioHistorialM() {
                             <input
                                 defaultValue={inputMedicamentos}
                                 onBlur={(e) => setInputMedicamentos(e.target.value)}
-                                ref={preguntaMedicamentos} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
+                                ref={preguntaMedicamentos} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                         </div>
                     )}
                 </div>
@@ -385,7 +389,7 @@ export default function FormularioHistorialM() {
                             <input
                                 defaultValue={inputAlergias}
                                 onBlur={(e) => setInputAlergias(e.target.value)}
-                                ref={preguntaAlergias} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
+                                ref={preguntaAlergias} type="text" className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                         </div>
                     )}
                 </div>
@@ -801,13 +805,33 @@ export default function FormularioHistorialM() {
                     idcliente: consulta.cita.cliente.idcliente,
                     idpaciente: consulta.cita.paciente.idpaciente,
                     idenfermedad: diseaseId,
-                    tratamiento_enfermedad: diseaseData.text.trim(), // Asegurarse de que no hay espacios en blanco
+                    tratamiento_enfermedad: diseaseData.text.trim(),
                 };
             });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (!isAllDiseasesFilled()) {
+            handleErrorSweet("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
+            return;
+        }
+
+        if (step == 2) {
+            if (complications && !preguntaComplicaciones?.current?.value?.trim()) {
+                return;
+            }
+            if (beingTreated && !preguntaTratamiento?.current?.value?.trim()) {
+                return;
+            }
+            if (takingMedication && !preguntaMedicamentos?.current?.value?.trim()) {
+                return;
+            }
+            if (allergic && !preguntaAlergias?.current?.value?.trim()) {
+                return;
+            }
+
+        }
 
         const diseasesData = getDiseasesData();
         const preguntas = {

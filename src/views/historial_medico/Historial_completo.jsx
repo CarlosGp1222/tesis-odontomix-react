@@ -5,30 +5,35 @@ import Spinner from '../../components/Spinner';
 import useDental from '../../hooks/useDental';
 import clienteAxios from '../../config/axios';
 import useSWR from 'swr';
+import { useParams } from 'react-router-dom';
 
 export default function Historial_completo() {
     const [historial_medico, setHistorial_medico] = useState([]);
     const idHistorial = localStorage.getItem('IDHISTORIAL');
+    // const { idHistorial } = useParams();
     const fetcher = () => clienteAxios(idHistorial ? `api/historial_medico/${idHistorial}` : null).then(datos => datos.data)
     const { data, error, isLoading } = useSWR(`api/historial_medico/${idHistorial}`, fetcher)
     const [enfermedades, setEnfermedades] = useState([]);
+    
     useEffect(() => {
         // console.log(data?.data);
-        if (data && data?.data) {
+        if (data && data.data) {
             // console.log(data);
             setHistorial_medico(data.data);
             setEnfermedades(data.data.enfermedad_paciente);
         }
-    }, [data, isLoading]);
+    }, [data, isLoading, idHistorial]);
 
     if (isLoading) return <Spinner />
     // console.log(isLoading);
+
+    console.log(data);
 
     if (historial_medico.length == 0) {
         return;
     }
 
-    console.log(historial_medico);
+    
 
     // const enfermedadesArray = historial_medico?.enfermedad_paciente;
     // console.log(enfermedadesArray);

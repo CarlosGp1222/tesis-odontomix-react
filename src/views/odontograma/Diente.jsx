@@ -27,7 +27,7 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha, 
                         [9, 10, 11].includes(diente.condiciones_dentales.idcondicionesd)) {
 
                         const clave = `${diente.ubicacion_dental.idhemisferio_diente}-${diente.posicion_dental.idposiciond}-${diente.condiciones_dentales.idcondicionesd}`;
-                        if (!acc[clave]) {
+                        if (!acc[clave] || acc[clave][0].idtratamientos != diente.idtratamientos) {
                             acc[clave] = [];
                         }
                         acc[clave].push(diente);

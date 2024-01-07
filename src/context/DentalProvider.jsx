@@ -98,7 +98,6 @@ const DentalProvider = ({ children }) => {
             // const { data: historial } = await clienteAxios.post(`api/historial_medico`, DatosHistorial);
 
             let formData = new FormData();
-            // console.log(c++);
             formData.append('idpaciente', idPaciente);
             formData.append('idconsulta', idConsulta);
             formData.append('idenfermedad_paciente', arrayEnfermedades.length > 0 ? idConsulta : '');
@@ -123,7 +122,7 @@ const DentalProvider = ({ children }) => {
             // formData.append('radiografia_historial', archivo);
             // formData.append('id_historial', historial?.data?.idhistorial); // Suponiendo que necesitas pasar el ID del historial
 
-            handleEditarDatos(idconsulta, estado_consulta, `api/consultas`, false);
+            handleEditarDatos(idconsulta, estado_consulta, `api/consultas`, false,false);
 
             // const response = await clienteAxios.post('api/radiografia', formData, {
             //     headers: {

@@ -71,13 +71,19 @@ export default function ModalDiente() {
     ubicacionesSeleccionadas.forEach(ubicacion => {
       datos.idubicaciond = ubicacion;
       if (datosActual?.datosDiente) {
-        let idParaURL = `${datosActual.idHistorial}/${datosActual.idposiciond}/${datosActual.idubicacion}`;
-        handleEditarDatos(idParaURL, datos, 'api/dientes');
-      }else{
+
+      } else {
         handleIngresarDatos(datos, 'api/dientes', false);
       }
     });
-    
+
+    if (datosActual?.datosDiente) {
+      let idParaURL = `${datosActual.idHistorial}/${datosActual.idposiciond}/${datosActual.idubicacion}`;
+      datos.idubicaciond = datosActual.idubicacion;
+      // console.log(datosActual);
+      handleEditarDatos(idParaURL, datos, 'api/dientes');
+    }
+
     setTimeout(() => {
       setActualizar(!actualizar);
     }, 1500);
@@ -96,7 +102,7 @@ export default function ModalDiente() {
   // if (isLoadingUbicaciones || isLoadingDientes) return <MiniSpinner />
 
   const handleElimimarDiente = () => {
-    const idParaURL = `${datosActual.idHistorial}/${datosActual.idposiciond}/${datosActual.idubicacion}`; 
+    const idParaURL = `${datosActual.idHistorial}/${datosActual.idposiciond}/${datosActual.idubicacion}`;
     handleEliminarDatos(idParaURL, 'api/dientes');
     setTimeout(() => {
       setActualizar(!actualizar);
