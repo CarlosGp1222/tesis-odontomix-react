@@ -761,11 +761,6 @@ export default function FormularioHistorialM() {
                         </div>
                     </div>
 
-                    {/* <div className="flex justify-end">
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
-                        Enviar
-                    </button>
-                </div> */}
                     <h2 className="text-lg font-semibold mb-3">Subir Radiografia</h2>
                     <div className="mb-3">
                         <label className="block text-gray-700 text-sm font-bold mb-2">Radiografia:</label>
@@ -793,24 +788,9 @@ export default function FormularioHistorialM() {
                     Siguiente
                 </button> */}
                 </div>
-                {/* <div className="flex justify-between">
-                <button
-                    onClick={prevStep}
-                    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
-                >
-                    Atrás
-                </button>
-                <button onClick={nextStep} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
-                    Siguiente
-                </button>
-            </div> */}
             </div>
         )
     };
-
-    // el StepFive tendra un input para subir cualquier tipo de archivo
-
-
 
     const getDiseasesData = () => {
         return Object.entries(selectedDiseases)
@@ -836,9 +816,6 @@ export default function FormularioHistorialM() {
             respuesta3: inputMedicamentos ? inputMedicamentos : '',
             respuesta4: inputAlergias ? inputAlergias : '',
         }
-        // console.log(inputValues);
-        // console.log(inputExamenIntraoral);
-        // console.log(archivo);
         handleSubmitHistorial(diseasesData, preguntas, inputValues, consulta.cita.paciente.idpaciente, consulta.idconsulta, navigate, inputExamenIntraoral, idconsulta, archivo);
         setBotonHabilidato(false);
 

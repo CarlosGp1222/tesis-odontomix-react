@@ -11,7 +11,7 @@ export default function VistaCitas() {
     const [citas, setCitas] = useState([]);
 
     const fetcher = () => clienteAxios('api/citas').then(datos => datos.data);
-    const { data, error, isLoading } = useSWR('api/citas', fetcher);
+    const { data, error, isLoading, mutate } = useSWR('api/citas', fetcher);
 
     useEffect(() => {
         handleTipoModal('citas');

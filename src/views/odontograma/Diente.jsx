@@ -6,7 +6,7 @@ import { FaGripLines } from "react-icons/fa";
 import MiniSpinner from '../../components/MiniSpiner';
 import { IoMdClose } from "react-icons/io";
 import { CgShapeZigzag } from "react-icons/cg";
-const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha, idhemisferio_diente }) => {
+const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha, idhemisferio_diente, estado_historial }) => {
     let error = false;
 
     const [estiloBorde, setEstiloBorde] = useState("");
@@ -35,16 +35,9 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha, 
                     }
                     return acc;
                 }, {});
-                console.log(dientes);
-                // console.log(dienteActual.posicion_dental.idposiciond);
                 const claveGrupo = `${dienteActual.ubicacion_dental.idhemisferio_diente}-${dienteActual.posicion_dental.idposiciond}-${dienteActual.condiciones_dentales.idcondicionesd}`;
                 const grupo = grupos[claveGrupo] || [];
-                // console.log(grupo);
-                // console.log( dienteActual.ubicacion_dental.ubicacion_diente);
                 const esPrimero = grupo[0]?.ubicacion_dental.ubicacion_diente == dienteActual.ubicacion_dental.ubicacion_diente;
-                // console.log(grupo[0]?.ubicacion_dental.ubicacion_diente +" - "+ dienteActual.ubicacion_dental.ubicacion_diente);
-                // console.log(dienteActual.ubicacion_dental.ubicacion_diente);
-                // console.log(grupo[grupo.length - 1]);
                 const esUltimo = grupo[grupo.length - 1]?.ubicacion_dental.ubicacion_diente == dienteActual.ubicacion_dental.ubicacion_diente;
 
                 let nuevoEstiloBorde = "";
@@ -84,6 +77,10 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha, 
 
     if (Object.keys(datosPosicion).length === 0) return <MiniSpinner />
     const handlePartClick = (idposiciond) => {
+
+        if (estado_historial === 1) {
+            return handleErrorSweet('No se puede modificar el odontograma, el paciente ya tiene un tratamiento finalizado');
+        }
 
         const datosDiente = dientes.find(d => d.idubicaciond === idubicacion && d.idposiciond === idposiciond);
 

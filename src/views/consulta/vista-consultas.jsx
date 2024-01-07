@@ -4,7 +4,7 @@ import clienteAxios from "../../config/axios";
 import useSWR from "swr";
 import Spinner from "../../components/Spinner";
 import { formatearFechaSinHora, formatearHora } from "../../helpers";
-import { Link, Navigate, useNavigate  } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import FormularioHistorialM from "./formulario-historialM";
 export default function VistaConsultas() {
   const navigate = useNavigate();
@@ -65,11 +65,21 @@ export default function VistaConsultas() {
                   <div className="mt-auto bg-blue-300 p-4">
                     <p className="text-gray-700 text-base">Fecha de la consulta: <span className="font-bold">{(formatearFechaSinHora(consulta.fecha_consulta))}</span></p>
                     {/* Botones de acciones */}
-                    {<div className="flex pl-4 pr-4 pt-4 border-gray-200">
-                      <button onClick={() => handleRealizarHistorial(consulta)} className="flex-1 text-center bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-1 px-3 rounded">
-                        Realizar Historial
-                      </button>
-                    </div> }
+                    {consulta.estado_consulta == 0 && (
+                      <div className="flex pl-4 pr-4 pt-4 border-gray-200">
+                        <button onClick={() => handleRealizarHistorial(consulta)} className="flex-1 text-center bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-1 px-3 rounded">
+                          Realizar Historial
+                        </button>
+                      </div>
+                    )}
+                    {consulta.estado_consulta == 1 && (
+                      <div className="flex pl-4 pr-4 pt-4 border-gray-200">
+                        <label className="flex-1 text-center bg-green-600 text-white font-bold py-1 px-3 rounded">
+                          Consulta realizada
+                        </label>
+                      </div>
+                    )}
+
                   </div>
 
 

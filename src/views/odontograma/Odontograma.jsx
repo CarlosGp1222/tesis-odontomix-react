@@ -7,9 +7,10 @@ import Spinner from '../../components/Spinner';
 import { FaSearch } from "react-icons/fa";
 import useDental from '../../hooks/useDental';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 export default function odontograma() {
-    const { handleTipoModal, handleDientes, actualizar, actualizarId } = useDental();
+    const { handleTipoModal, handleDientes, actualizar, actualizarId, handleErrorSweet, dientes: dientesUse, handleIngresarDatos, handleEditarDatos } = useDental();
     const { idHistorial } = useParams();
 
     const [datosId, setDatosId] = useState({});
@@ -25,17 +26,7 @@ export default function odontograma() {
 
 
     const { data: dataPaciente, error: errorPaciente, isLoading: isLoadingPaciente } = useSWR('api/pacientes', url => clienteAxios(url).then(res => res.data));
-    // const { data: dataPaciente } = useSWR('api/pacientes', fetcherPaciente);
 
-    // const obtenerPacientes = async () => {
-    //     try {
-    //         const fetcherPaciente = () => clienteAxios('api/pacientes').then(datos => datos.data);
-    //         const { data: dataPaciente } = useSWR('api/pacientes', fetcherPaciente);
-    //         setPacientes(dataPaciente.data); // Ajusta según la estructura de tu respuesta
-    //     } catch (error) {
-    //         console.error('Error al obtener pacientes:', error);
-    //     }
-    // };
 
     const handlePacienteChange = (e) => {
         const identificacion = e.target.value;
@@ -60,8 +51,6 @@ export default function odontograma() {
         const renderizarDientes = (rangoInicio, rangoFin) => {
             let dientesFiltrados = dientes
                 .filter(diente => diente.ubicacion_diente >= Math.min(rangoInicio, rangoFin) && diente.ubicacion_diente <= Math.max(rangoInicio, rangoFin));
-
-            // console.log(dientesFiltrados);
             if (rangoInicio > rangoFin) {
                 dientesFiltrados = dientesFiltrados.sort((a, b) => b.ubicacion_diente - a.ubicacion_diente);
             } else {
@@ -77,6 +66,7 @@ export default function odontograma() {
                     nombre_diente={diente.nombre_diente}
                     numeroFicha={idHistorial}
                     idhemisferio_diente={diente.idhemisferio_diente}
+                    estado_historial={datosHistorial?.data?.estado_historial}
                 />
             ));
         };
@@ -115,13 +105,6 @@ export default function odontograma() {
         } else if (error) {
             setConsultarAPI(false); // Desactiva consultas adicionales si hay un error
         }
-        // obtenerPacientes();
-
-        // if (datosHistorial && datosHistorial.data.idhistorial) {
-        //     setDatosId(datosHistorial.data.idhistorial);
-        //     handleDientes(datosHistorial?.data?.idhistorial, 'api/dientes');            
-
-        // }
     }, [datosHistorial, isLoading, actualizar, actualizarId, datosId, isLoadingDatosHistorial]);
 
     const datosPaciente = datosHistorial?.data?.paciente;
@@ -131,8 +114,37 @@ export default function odontograma() {
     const handleBuscaNumero = (e) => {
         e.preventDefault();
         const idPaciente = dataPaciente.data.find(paciente => paciente.identificacion_paciente === pacienteSeleccionado)?.idpaciente;
-        console.log(idPaciente);
-    }   
+        if (dataPaciente && idPaciente) {
+            clienteAxios.get(`api/historial_medico2/${idPaciente}`).then(res => {
+                if (res.data.data) {
+                    window.location.href = `/odontograma/creacion-odontograma/${res.data.data.numero_ficha}`;
+                } else {
+                    window.location.href = `/odontograma/creacion-odontograma/${idPaciente}`;
+                }
+            }).catch(err => {
+                handleErrorSweet(err?.response?.data?.errors);
+            })
+        }
+    }
+
+    const handleGuardarOdontograma = (e) => {
+        e.preventDefault();
+        // console.log(dientesUse.length > 0);
+        if (dientesUse.length > 0) {
+            const datos = {
+                idhistorial: datosHistorial?.data?.idhistorial,
+                iddiente: datosHistorial?.data?.idhistorial,
+                estado_odontograma: 1
+            }
+            console.log(datos);
+            handleIngresarDatos(datos, 'api/odontograma', false, true, false);
+            handleEditarDatos(datosHistorial?.data?.idhistorial, {estado_historial: 1}, 'api/historial_medico', false, false);
+            // window.location.href = `/historial/lista-historial`;
+        }else{
+            handleErrorSweet('Debe ingresar al menos un diente');
+        }
+    }
+
 
     return (
         <div className='mt-5'>
@@ -198,7 +210,7 @@ export default function odontograma() {
 
                 </div>
                 <div>
-                    <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
+                    <button onClick={handleGuardarOdontograma} className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${Datosdientes && datosHistorial?.data?.estado_historial == 0 ? '':'hidden'}`}>
                         Guardar odontograma
                     </button>
                 </div>
