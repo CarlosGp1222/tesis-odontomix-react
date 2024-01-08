@@ -3,6 +3,7 @@ import useDental from '../../hooks/useDental';
 import Spinner from '../../components/Spinner';
 import { FaRegSquarePlus } from "react-icons/fa6";
 import { FaGripLines } from "react-icons/fa";
+import Swal from 'sweetalert2';
 import MiniSpinner from '../../components/MiniSpiner';
 import { IoMdClose } from "react-icons/io";
 import { CgShapeZigzag } from "react-icons/cg";
@@ -11,7 +12,7 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha, 
 
     const [estiloBorde, setEstiloBorde] = useState("");
     const [estiloLineas, setEstiloLineas] = useState("");
-    const { datosPosicion, handleDatosActual, handleErrorSweet, dientes, modal } = useDental();
+    const { datosPosicion, handleDatosActual, handleErrorSweet, dientes, modal, handleEliminarDatos, setActualizar, actualizar, handleClickModal } = useDental();
 
     const aplicarEstilosInvertidos = idhemisferio_diente >= 5 && idhemisferio_diente <= 8;
 
@@ -65,7 +66,7 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha, 
 
                 setEstiloBorde(nuevoEstiloBorde);
                 let nuevoEstiloLineas = "";
-                
+
                 if (dienteActual.condiciones_dentales.idcondicionesd === 11) {
                     nuevoEstiloLineas = esPrimero ? 'F' : esUltimo ? 'L' : 'N';
                 }
@@ -76,10 +77,36 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha, 
     }, [dientes, idubicacion, idhemisferio_diente]);
 
     if (Object.keys(datosPosicion).length === 0) return <MiniSpinner />
+
+
     const handlePartClick = (idposiciond) => {
 
         if (estado_historial === 1) {
             return handleErrorSweet('No se puede modificar el odontograma, el paciente ya tiene un tratamiento finalizado');
+        }
+
+        const grupoFiltrado = dientes.filter(diente => diente.ubicacion_dental.idhemisferio_diente == idhemisferio_diente && diente.posicion_dental.idposiciond == idposiciond && (diente.condiciones_dentales.idcondicionesd == 9 || diente.condiciones_dentales.idcondicionesd == 10 || diente.condiciones_dentales.idcondicionesd == 11));
+
+        console.log(grupoFiltrado);
+        if (grupoFiltrado.length > 0 && grupoFiltrado.some(objeto => objeto.idubicaciond === idubicacion)) {
+
+            let idParaURL = `${idHistorial}/${idubicacion}/${grupoFiltrado.find(objeto => objeto.idubicaciond === idubicacion).idcondicionesd}/${idposiciond}`;
+            // console.log();
+            handleEliminarDatos(idParaURL, 'api/dientes2', `Elimina ls dientes con la condicion ${grupoFiltrado.find(objeto => objeto.idubicaciond === idubicacion).condiciones_dentales.nombre_condicion} en el ${grupoFiltrado.find(objeto => objeto.idubicaciond === idubicacion).ubicacion_dental.hemisferio.nombre_hemisferio}`);
+            setTimeout(() => {                
+                setActualizar(!actualizar);
+            }, 2000);
+
+            // Swal.fire(
+            //     'Eliminado!',
+            //     'Los datos fueron eliminados con exito.',
+            //     'success'
+            // )
+
+            return;
+
+
+
         }
 
         const datosDiente = dientes.find(d => d.idubicaciond === idubicacion && d.idposiciond === idposiciond);
@@ -98,6 +125,7 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha, 
             idcondicionesd: datosDiente?.idcondicionesd ? datosDiente?.idcondicionesd : null,
             descripcion_diente: datosDiente?.descripcion_diente ? datosDiente?.descripcion_diente : '',
             datosDiente: datosDiente ? datosDiente : null,
+            idhemisferio_diente: idhemisferio_diente,
         };
 
         handleDatosActual(datos);

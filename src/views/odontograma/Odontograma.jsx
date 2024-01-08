@@ -6,17 +6,19 @@ import clienteAxios from "../../config/axios";
 import Spinner from '../../components/Spinner';
 import { FaSearch } from "react-icons/fa";
 import useDental from '../../hooks/useDental';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+// import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
 export default function odontograma() {
     const { handleTipoModal, handleDientes, actualizar, actualizarId, handleErrorSweet, dientes: dientesUse, handleIngresarDatos, handleEditarDatos } = useDental();
     const { idHistorial } = useParams();
 
+    const navigate = useNavigate();
     const [datosId, setDatosId] = useState({});
     const [odontograma, setOdontograma] = useState(null);
     const [consultarAPI, setConsultarAPI] = useState(true); // Controla si se debe consultar la API
-    const [pacientes, setPacientes] = useState([]); // Almacena los pacientes obtenidos de la API
+    //const [pacientes, setPacientes] = useState([]); // Almacena los pacientes obtenidos de la API
     const [pacienteSeleccionado, setPacienteSeleccionado] = useState(''); // Almacena el paciente seleccionado en el input
     const [noExistePaciente, setNoExistePaciente] = useState(false);
 
@@ -138,7 +140,9 @@ export default function odontograma() {
             }
             console.log(datos);
             handleIngresarDatos(datos, 'api/odontograma', false, true, false);
+            
             handleEditarDatos(datosHistorial?.data?.idhistorial, {estado_historial: 1}, 'api/historial_medico', false, false);
+            navigate(`/historial/lista-historial`);
             // window.location.href = `/historial/lista-historial`;
         }else{
             handleErrorSweet('Debe ingresar al menos un diente');

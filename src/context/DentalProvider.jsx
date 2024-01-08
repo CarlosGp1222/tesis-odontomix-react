@@ -353,27 +353,32 @@ const DentalProvider = ({ children }) => {
         })
     }
 
-    const handleEliminarDatos = (id, url) => {
-        Swal.fire({
-            title: 'Estas seguro de eliminarlo?',
-            text: "No podras recuperar la información!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Si, Eliminar!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                clienteAxios.delete(`${url}/${id}`);
-                mutate(url);
-                Swal.fire(
-                    'Eliminado!',
-                    'Los datos fueron eliminados con exito.',
-                    'success'
-                )
-            }
-        })
-
+    const handleEliminarDatos = (id, url, text = "No podras recuperar la información!", alerta = true) => {
+        console.log(id, url, text);
+        if (alerta) {
+            Swal.fire({
+                title: 'Estas seguro de eliminarlo?',
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Si, Eliminar!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log(clienteAxios.delete(`${url}/${id}`));
+                    mutate(url);
+                    Swal.fire(
+                        'Eliminado!',
+                        'Los datos fueron eliminados con exito.',
+                        'success'
+                    )
+                }
+            })
+        }else{
+            clienteAxios.delete(`${url}/${id}`);
+            mutate(url);
+        }        
     }
 
     const handleDientes = async (id, url) => {

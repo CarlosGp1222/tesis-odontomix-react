@@ -41,6 +41,32 @@ export default function ModalDiente() {
       return;
     }
 
+    console.log(datosActual);
+
+    // console.log(datosDientes.data);
+    console.log(selectedCondicion ? selectedCondicion : datosActual.idcondicionesd);
+    const condicionesPermitidas = [9, 10, 11];
+    if (condicionesPermitidas.includes(selectedCondicion)) {
+      // Verificar si ya existen condiciones en el mismo hemisferio
+      const condicionExistente = datosDientes.data.find(diente =>
+        diente.ubicacion_dental.idhemisferio_diente === datosActual.idhemisferio_diente &&
+        condicionesPermitidas.includes(diente.idcondicionesd)
+      );
+  
+      // Si ya existe una condición y es diferente a la seleccionada o el tratamiento no coincide
+      if (condicionExistente &&
+        (condicionExistente.idcondicionesd !== selectedCondicion || condicionExistente.idtratamientos !== data.get('tratamiento'))) {
+        handleErrorSweet('Este hemisferio ya tiene una condición registrada que no coincide con la seleccionada o el tratamiento es diferente.');
+        return;
+      }
+    }
+
+    // console.log(filtrarDatos);
+    // if (hemisferioOcupado) {
+    //   handleErrorSweet('Este diente ya tiene un registro');
+    //   return;
+    // }
+
     const datos = {
       iddiente: datosActual.idHistorial,
       idposiciond: datosActual.idposiciond,
@@ -80,7 +106,6 @@ export default function ModalDiente() {
     if (datosActual?.datosDiente) {
       let idParaURL = `${datosActual.idHistorial}/${datosActual.idposiciond}/${datosActual.idubicacion}`;
       datos.idubicaciond = datosActual.idubicacion;
-      // console.log(datosActual);
       handleEditarDatos(idParaURL, datos, 'api/dientes');
     }
 
@@ -93,13 +118,12 @@ export default function ModalDiente() {
 
   useEffect(() => {
     if (datosUbicaciones) {
+
       setSelectedCondicion(datosActual.idcondicionesd);
       setUbicaciones(datosUbicaciones.data);
       setUbicacionesSeleccionadas([datosActual.idubicacion]);
     }
   }, [datosUbicaciones]);
-
-  // if (isLoadingUbicaciones || isLoadingDientes) return <MiniSpinner />
 
   const handleElimimarDiente = () => {
     const idParaURL = `${datosActual.idHistorial}/${datosActual.idposiciond}/${datosActual.idubicacion}`;
