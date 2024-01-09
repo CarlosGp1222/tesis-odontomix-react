@@ -63,7 +63,8 @@ const DentalProvider = ({ children }) => {
         }
     }
 
-    const handleSubmitHistorial = async (arrayEnfermedades, Preguntas, Examenes, idPaciente, idConsulta, navigate, inputExamenIntraoral, idconsulta, archivo) => {
+    const handleSubmitHistorial = async (arrayEnfermedades, Preguntas, Examenes, idPaciente, idConsulta, navigate, inputExamenIntraoral, idconsulta, archivo, setBotonHabilidato) => {
+        setBotonHabilidato(false);
         let c = 0;
         try {
             if (arrayEnfermedades.length > 0) {
@@ -131,6 +132,7 @@ const DentalProvider = ({ children }) => {
             // });
 
             toast.info(`Datos ingresados correctamente`);
+            
             navigate(`/odontograma/creacion-odontograma/${response.data.data.numero_ficha}`)
         } catch (error) {
 

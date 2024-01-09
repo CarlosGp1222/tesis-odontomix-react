@@ -36,29 +36,39 @@ export default function Historial_completo() {
     // console.log(data);
     const printDocument = () => {
         const input = document.getElementById('divToPrint');
-        html2canvas(input, { scale: 1.5 }).then(canvas => {
+        
+        // Se asegura de que el renderizado se complete con los estilos aplicados
+        window.scrollTo(0, 0);
+        
+        html2canvas(input, {
+            scale: 1.5,
+            // Ajuste para asegurar que se use toda la altura de la ventana
+            windowHeight: input.scrollHeight,
+        }).then(canvas => {
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
             const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfWidth = pdf.internal.pageSize.getWidth() - 1.5;
             const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
             let heightLeft = pdfHeight;
-            let position = 0;
-
+            
+            // Ajusta la posición inicial si es necesario para mover el contenido hacia arriba
+            let position = -10; // Prueba con diferentes valores si es necesario
+            
             pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
             heightLeft -= pdf.internal.pageSize.getHeight();
-
+            
             while (heightLeft >= 0) {
-                position = heightLeft - pdfHeight;
+                position = heightLeft - pdfHeight -10;
                 pdf.addPage();
                 pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
                 heightLeft -= pdf.internal.pageSize.getHeight();
             }
-
+            
             pdf.save('download.pdf');
         });
-    }
-
+    };
+    
     const enfermedadesArray = historial_medico?.enfermedad_paciente;
 
     return (

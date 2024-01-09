@@ -776,8 +776,8 @@ export default function FormularioHistorialM() {
                         {archivo && <div className="mt-2 text-gray-600">Archivo seleccionado: {archivo.name}</div>}
                     </div>
                     <div className="flex justify-end">
-                        <button className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out`}>
-                            Enviar Formulario
+                        <button disabled={!botonHabilitado} className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out`}>
+                            {botonHabilitado ? 'Enviar Formulario' : 'Enviando...'}
                         </button>
                     </div>
                 </section>
@@ -840,8 +840,8 @@ export default function FormularioHistorialM() {
             respuesta3: inputMedicamentos ? inputMedicamentos : '',
             respuesta4: inputAlergias ? inputAlergias : '',
         }
-        handleSubmitHistorial(diseasesData, preguntas, inputValues, consulta.cita.paciente.idpaciente, consulta.idconsulta, navigate, inputExamenIntraoral, idconsulta, archivo);
-        setBotonHabilidato(false);
+        handleSubmitHistorial(diseasesData, preguntas, inputValues, consulta.cita.paciente.idpaciente, consulta.idconsulta, navigate, inputExamenIntraoral, idconsulta, archivo, setBotonHabilidato);
+
 
 
     };
