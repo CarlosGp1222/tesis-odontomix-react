@@ -138,7 +138,7 @@ const DentalProvider = ({ children }) => {
 
             console.log(error);
             const mensajesError = handleErrores(error);
-            setBotonHabilidato(false);
+            setBotonHabilidato(true);
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
