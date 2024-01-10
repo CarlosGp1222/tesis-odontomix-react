@@ -32,7 +32,7 @@ export default function Historial_medico() {
         navigate(`/odontograma/creacion-odontograma/${historial_medico}`)
     }
     return (
-        <div className="min-w-full overflow-auto rounded-lg shadow p-4 max-h-[500px]">
+        <div className="min-w-full overflow-hidden rounded-lg shadow p-4">
             <div className="mb-4 mt-4">
                 <h3 className="text-gray-600 text-3xl font-medium text-center font-serif">Lista de Historial medico</h3>
             </div>
