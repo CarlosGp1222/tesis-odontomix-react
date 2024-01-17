@@ -37,44 +37,41 @@ export default function Historial_completo() {
     const printDocument = () => {
         const input = document.getElementById('divToPrint');
         
-        // Se asegura de que el renderizado se complete con los estilos aplicados
         window.scrollTo(0, 0);
-        
+
         html2canvas(input, {
             scale: 1.5,
-            // Ajuste para asegurar que se use toda la altura de la ventana
             windowHeight: input.scrollHeight,
         }).then(canvas => {
             const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdf = new jsPDF('p', 'mm', 'letter');
             const imgProps = pdf.getImageProperties(imgData);
             const pdfWidth = pdf.internal.pageSize.getWidth() - 1.5;
             const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
             let heightLeft = pdfHeight;
             
-            // Ajusta la posición inicial si es necesario para mover el contenido hacia arriba
             let position = -10; // Prueba con diferentes valores si es necesario
-            
+
             pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
             heightLeft -= pdf.internal.pageSize.getHeight();
-            
+
             while (heightLeft >= 0) {
-                position = heightLeft - pdfHeight -10;
+                position = heightLeft - pdfHeight - 10;
                 pdf.addPage();
                 pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
                 heightLeft -= pdf.internal.pageSize.getHeight();
             }
-            
+
             pdf.save('download.pdf');
         });
     };
-    
+
     const enfermedadesArray = historial_medico?.enfermedad_paciente;
 
     return (
-        <div  className="min-h-screen bg-gray-100 flex justify-center items-center">
-            <div  className="mt-4">
-                <div id="divToPrint" className="w-full max-w-6xl bg-white shadow-md rounded px-8 pt-6 pb-8">
+        <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+            <div className="mt-4">
+                <div  className="w-full max-w-6xl bg-white shadow-md rounded px-8 pt-6 pb-8">
 
                     <div className='flex max-h-40 justify-center items-center'>
 
@@ -195,7 +192,6 @@ export default function Historial_completo() {
                                     <span className='ml-2 mb-6'>Ninguna</span>
                                 )
                             }
-                            {/* <span className='ml-2 mb-6'>Ninguna</span> */}
                         </div>
                         <div className='flex text-sm flex-col border-2 p-4'>
                             <label className='border-b-2 font-serif font-bold  mb-5 text-center text-lg'>

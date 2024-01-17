@@ -167,7 +167,6 @@ export default function CitasModal() {
             placeholder="Escribe la identificación del cliente"
             defaultValue={inputCliente}
             onChange={handleClienteChange}
-            // que si esta vacio o si no existe el cliente
             className={`shadow appearance-none border ${errores.inputCliente || noExisteCliente ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
           />
           {noExisteCliente && (
@@ -183,8 +182,6 @@ export default function CitasModal() {
             ))}
           </datalist>
         </div>
-
-        {/* Input de Paciente */}
         <div>
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Identificación Paciente: <span className="text-red-500">*</span>
@@ -194,7 +191,6 @@ export default function CitasModal() {
             defaultValue={datosActual.idpaciente ? datosActual.paciente.identificacion_paciente : ''}
             placeholder="Escribe la identificación del paciente"
             onChange={handlePacienteChange}
-            // que si esta vacio o si no existe el paciente
             className={`shadow appearance-none border ${errores.inputPaciente || noExistePaciente ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
           />
           {noExistePaciente && (
@@ -218,13 +214,9 @@ export default function CitasModal() {
             placeholder="Escribe el motivo de la cita"
             defaultValue={datosActual.concepto_cita ? datosActual.concepto_cita : ''}
             ref={concepto_cita}
-            // textarea mas grande
             className={`shadow appearance-none border ${errores.concepto_cita ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
           />
         </div>
-
-        {/* Aquí puedes continuar con el resto de campos para la cita, como fecha, hora, motivo, etc. */}
-
         <div className="col-span-2 flex justify-end">
           <button type="submit" className="bg-slate-800 text-white px-6 py-2 rounded-full hover:bg-slate-900 focus:outline-none focus:bg-slate-900">
           {datosActual.idcita ? 'Actualizar Cita' : 'Crear Cita'}
@@ -233,5 +225,4 @@ export default function CitasModal() {
       </form>
     </div>
   );
-
 }

@@ -12,6 +12,8 @@ import Odontograma from './views/odontograma/Odontograma';
 import FormularioHistorialM from './views/consulta/formulario-historialM';
 import Historial_medico from './views/historial_medico/Historial_medico';
 import Historial_completo from './views/historial_medico/Historial_completo';
+import Vistafactura from './views/facturacion/vista-factura';
+import Facturacion from './views/facturacion/facturacion';
 
 const router = createBrowserRouter([
     {
@@ -118,6 +120,22 @@ const router = createBrowserRouter([
                 path: '/odontograma/creacion-odontograma/:idHistorial',
                 element: <Odontograma />,
             },
+        ],
+    },
+
+    // Factura
+    {
+        path: '/factura',
+        element: <Layout />,
+        children: [
+            {
+                path: '/factura/lista-factura',
+                element: <Vistafactura />,
+            },
+            {
+                path: '/factura/facturacion',
+                element: <Facturacion />,
+            }
         ],
     },
 ]);

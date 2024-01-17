@@ -13,7 +13,7 @@ export default function ModalDiente() {
   const { data: tratamientosDatos, isLoading: isLodingTratamiento } = useSWR('api/tratamientos_dentales', fetcher)
   const fetchercondiones = () => clienteAxios('api/condiciones_dentales').then(datos => datos.data)
   const { data: condicionesDatos, isLoading: isLodingCondicion } = useSWR('api/condiciones_dentales', fetchercondiones)
-  const { datosActual, handleClickModal, setActualizar, handleEditarDatos } = useDental();
+  const { datosActual, handleClickModal, setActualizar, handleEditarDatos, dientes: datosDientes } = useDental();
   const tratamientos = tratamientosDatos?.data;
   const condiciones = condicionesDatos?.data;
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -24,7 +24,7 @@ export default function ModalDiente() {
 
   const { data: datosUbicaciones, isLoading: isLoadingUbicaciones } = useSWR('api/ubicacion_dental', () => clienteAxios('api/ubicacion_dental').then(res => res.data));
 
-  const { data: datosDientes, isLoading: isLoadingDientes } = useSWR(`api/dientes/${datosActual.idHistorial}`, () => clienteAxios('api/dientes').then(res => res.data));
+  // const { data: datosDientes, isLoading: isLoadingDientes } = useSWR(`api/dientes/${datosActual.idHistorial}`, () => clienteAxios('api/dientes').then(res => res.data));
 
   const handleCondicionChange = (condicion) => {
     setSelectedCondicion(condicion);
@@ -44,14 +44,16 @@ export default function ModalDiente() {
     console.log(datosActual);
 
     // console.log(datosDientes.data);
-    console.log(selectedCondicion ? selectedCondicion : datosActual.idcondicionesd);
+    // console.log(selectedCondicion ? selectedCondicion : datosActual.idcondicionesd);
     const condicionesPermitidas = [9, 10, 11];
     if (condicionesPermitidas.includes(selectedCondicion)) {
       // Verificar si ya existen condiciones en el mismo hemisferio
-      const condicionExistente = datosDientes.data.find(diente =>
+      const condicionExistente = datosDientes.find(diente =>
         diente.ubicacion_dental.idhemisferio_diente === datosActual.idhemisferio_diente &&
         condicionesPermitidas.includes(diente.idcondicionesd)
       );
+
+      console.log(condicionExistente);
   
       // Si ya existe una condición y es diferente a la seleccionada o el tratamiento no coincide
       if (condicionExistente &&
@@ -80,7 +82,7 @@ export default function ModalDiente() {
     let ubicacionesConDatos = [];
 
     ubicacionesSeleccionadas.forEach(ubicacion => {
-      const diente = datosDientes?.data.filter(d => d.idubicaciond === ubicacion && d.idposiciond === datosActual.idposiciond && d.iddiente === datosActual.idHistorial);
+      const diente = datosDientes?.filter(d => d.idubicaciond === ubicacion && d.idposiciond === datosActual.idposiciond && d.iddiente === datosActual.idHistorial);
       if (diente.length > 0) {
         ubicacionesConDatos.push(diente[0]?.ubicacion_dental?.ubicacion_diente);
         dientesUsado = true;

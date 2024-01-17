@@ -64,7 +64,7 @@ export default function Sidebar() {
         </li>
         
         <li className='mb-2'>
-          <Link onClick={() => handleMenuClick('lista-factura')} to="/factura/lista-factura" className={`block py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white ${isPathActive('/lista-factura') ? 'bg-cyan-600' : ''}`}>
+          <Link onClick={() => handleMenuClick('facturacion')} to="/factura/facturacion" className={`block py-2.5 px-4 rounded transition duration-200 hover:bg-cyan-600 hover:text-white ${isPathActive('/facturacion') ? 'bg-cyan-600' : ''}`}>
             Facturación
           </Link>
         </li>

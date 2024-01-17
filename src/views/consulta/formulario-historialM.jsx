@@ -76,7 +76,6 @@ export default function FormularioHistorialM() {
 
 
             const resExamenesIntraOral = await clienteAxios('api/examenes_intraoral');
-            // console.log(resExamenesIntraOral.data);
             setExamenEncia(resExamenesIntraOral.data.examen_encia);
             setExamenLengua(resExamenesIntraOral.data.examen_lengua);
             setExamenPaladarD(resExamenesIntraOral.data.examen_paladar_duro);
@@ -84,8 +83,6 @@ export default function FormularioHistorialM() {
             setExamenRebordeR(resExamenesIntraOral.data.examen_reborde);
             setExamenTipoOclusion(resExamenesIntraOral.data.examen_oclusion);
             setExamenPisoB(resExamenesIntraOral.data.examen_piso_boca);
-
-
         } catch (error) {
             console.error('Error al cargar los datos:', error);
         }
@@ -103,7 +100,7 @@ export default function FormularioHistorialM() {
     const idconsulta = localStorage.getItem('IDCONSULTA');
     const [selectedDiseases, setSelectedDiseases] = useState([]);
     const [diseaseDetails, setDiseaseDetails] = useState({});
-    // console.log(step);
+    
     const handleDiseaseChange = (disease) => {
         setSelectedDiseases((prevSelectedDiseases) => ({
             ...prevSelectedDiseases,
@@ -130,9 +127,6 @@ export default function FormularioHistorialM() {
     const fetcherEnfermedades = () => clienteAxios(`api/enfermedades`).then(datos => datos.data);
     const { data: datosEnfermedades, isLoading: loadingEnfermedades } = useSWR(`api/enfermedades`, fetcherEnfermedades);
 
-    // const cargarExamenes = async () => {
-
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setInputValues({
@@ -149,15 +143,10 @@ export default function FormularioHistorialM() {
         });
     };
 
-    // useEffect(() => {
-    //     cargarExamenes()
-    // }, []);
-
     useEffect(() => {
         handleInputChange
     }, [inputValues]);
 
-    // console.log(step);
     const nextStep = () => {
         if (!isAllDiseasesFilled()) {
             handleErrorSweet("Por favor, complete los detalles de todas las enfermedades seleccionadas antes de continuar.");
@@ -830,7 +819,6 @@ export default function FormularioHistorialM() {
             if (allergic && !preguntaAlergias?.current?.value?.trim()) {
                 return;
             }
-
         }
 
         const diseasesData = getDiseasesData();

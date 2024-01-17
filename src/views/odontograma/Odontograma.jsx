@@ -7,8 +7,8 @@ import Spinner from '../../components/Spinner';
 import { FaSearch } from "react-icons/fa";
 import useDental from '../../hooks/useDental';
 import { useParams, useNavigate } from 'react-router-dom';
-// import { useNavigate } from "react-router-dom";
-import axios from 'axios';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 export default function odontograma() {
     const { handleTipoModal, handleDientes, actualizar, actualizarId, handleErrorSweet, dientes: dientesUse, handleIngresarDatos, handleEditarDatos } = useDental();
@@ -17,9 +17,8 @@ export default function odontograma() {
     const navigate = useNavigate();
     const [datosId, setDatosId] = useState({});
     const [odontograma, setOdontograma] = useState(null);
-    const [consultarAPI, setConsultarAPI] = useState(true); // Controla si se debe consultar la API
-    //const [pacientes, setPacientes] = useState([]); // Almacena los pacientes obtenidos de la API
-    const [pacienteSeleccionado, setPacienteSeleccionado] = useState(''); // Almacena el paciente seleccionado en el input
+    const [consultarAPI, setConsultarAPI] = useState(true);
+    const [pacienteSeleccionado, setPacienteSeleccionado] = useState('');
     const [noExistePaciente, setNoExistePaciente] = useState(false);
 
     const fetcherHisto = url => clienteAxios(url).then(res => res.data);
@@ -37,6 +36,39 @@ export default function odontograma() {
         const pacienteExiste = dataPaciente?.data.some(paciente => paciente.identificacion_paciente === identificacion);
         setNoExistePaciente(!pacienteExiste);
     };
+
+    const printDocument = () => {
+        const input = document.getElementById('divToPrint');
+        
+        window.scrollTo(0, 0);
+
+        html2canvas(input, {
+            scale: 1.5,
+            windowHeight: input.scrollHeight,
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'letter');
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth() - 1.5;
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            let heightLeft = pdfHeight;
+            
+            let position = -10; // Prueba con diferentes valores si es necesario
+
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+            heightLeft -= pdf.internal.pageSize.getHeight();
+
+            while (heightLeft >= 0) {
+                position = heightLeft - pdfHeight - 10;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                heightLeft -= pdf.internal.pageSize.getHeight();
+            }
+
+            pdf.save('download.pdf');
+        });
+    };
+
 
 
     const fetcher = () => clienteAxios('api/ubicacion_dental').then(datos => datos.data)
@@ -103,11 +135,10 @@ export default function odontograma() {
             setDatosId(datosHistorial.data.idhistorial);
             handleDientes(datosHistorial.data.idhistorial, 'api/dientes');
             setOdontograma(funcionDeclaramiento());
-
         } else if (error) {
-            setConsultarAPI(false); // Desactiva consultas adicionales si hay un error
+            setConsultarAPI(false);
         }
-    }, [datosHistorial, isLoading, actualizar, actualizarId, datosId, isLoadingDatosHistorial]);
+    }, [datosHistorial, isLoading, actualizar, actualizarId, datosId, isLoadingDatosHistorial, pacienteSeleccionado]);
 
     const datosPaciente = datosHistorial?.data?.paciente;
 
@@ -119,9 +150,9 @@ export default function odontograma() {
         if (dataPaciente && idPaciente) {
             clienteAxios.get(`api/historial_medico2/${idPaciente}`).then(res => {
                 if (res.data.data) {
-                    window.location.href = `/odontograma/creacion-odontograma/${res.data.data.numero_ficha}`;
+                    navigate(`/odontograma/creacion-odontograma/${res.data.data.numero_ficha}`);
                 } else {
-                    window.location.href = `/odontograma/creacion-odontograma/${idPaciente}`;
+                    navigate(`/odontograma/creacion-odontograma/${idPaciente}`);
                 }
             }).catch(err => {
                 handleErrorSweet(err?.response?.data?.errors);
@@ -131,7 +162,6 @@ export default function odontograma() {
 
     const handleGuardarOdontograma = (e) => {
         e.preventDefault();
-        // console.log(dientesUse.length > 0);
         if (dientesUse.length > 0) {
             const datos = {
                 idhistorial: datosHistorial?.data?.idhistorial,
@@ -217,6 +247,7 @@ export default function odontograma() {
                     <button onClick={handleGuardarOdontograma} className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${Datosdientes && datosHistorial?.data?.estado_historial == 0 ? '':'hidden'}`}>
                         Guardar odontograma
                     </button>
+                    <button onClick={printDocument} className='bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded'>Imprimir</button>
                 </div>
             </div>
         </div>

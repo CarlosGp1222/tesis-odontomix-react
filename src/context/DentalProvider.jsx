@@ -83,21 +83,7 @@ const DentalProvider = ({ children }) => {
             const { data: datosPreguntas } = await clienteAxios.post(`api/preguntas`, Preguntas);
             const { data: datosExamenes } = await clienteAxios.post(`api/examen_extraoral`, Examenes);
             const { data: datosExamenIntraoral } = await clienteAxios.post(`api/examen_intraoral`, inputExamenIntraoral);
-
-
-
-            // const DatosHistorial = {
-            //     idpaciente: idPaciente,
-            //     idconsulta: idConsulta,
-            //     idenfermedad_paciente: arrayEnfermedades.length > 0 ? idConsulta : '',
-            //     idpregunta: datosPreguntas?.data?.idpreguntas ? datosPreguntas?.data?.idpreguntas : '',
-            //     idexamen_extraoral: datosExamenes.data.idextraoral ? datosExamenes.data.idextraoral : '',
-            //     estado_historial: 0,
-            //     idexamen_intraoral: datosExamenIntraoral.data.idintraoral ? datosExamenIntraoral.data.idintraoral : '',
-            // }
-            // // console.log(DatosHistorial);
-            // const { data: historial } = await clienteAxios.post(`api/historial_medico`, DatosHistorial);
-
+            
             let formData = new FormData();
             formData.append('idpaciente', idPaciente);
             formData.append('idconsulta', idConsulta);
@@ -119,17 +105,7 @@ const DentalProvider = ({ children }) => {
                 estado_consulta: 1
             }
 
-            // let formData = new FormData();
-            // formData.append('radiografia_historial', archivo);
-            // formData.append('id_historial', historial?.data?.idhistorial); // Suponiendo que necesitas pasar el ID del historial
-
             handleEditarDatos(idconsulta, estado_consulta, `api/consultas`, false,false);
-
-            // const response = await clienteAxios.post('api/radiografia', formData, {
-            //     headers: {
-            //         'Content-Type': 'multipart/form-data'
-            //     }
-            // });
 
             toast.info(`Datos ingresados correctamente`);
             
@@ -200,6 +176,8 @@ const DentalProvider = ({ children }) => {
                         window.location.reload();
                     }, 2000);
                 }
+                console.log(data);
+                return data.data;
             } else {
                 const { data } = await clienteAxios.post(`${url}`, datos);
                 toast.info(`Datos ingresados correctamente`);
@@ -207,6 +185,7 @@ const DentalProvider = ({ children }) => {
                     handleClickModal();
                 }
                 mutate(url);
+                return data;
             }
         } catch (error) {
             // console.log(error.response.data.errors);
@@ -387,6 +366,7 @@ const DentalProvider = ({ children }) => {
     const handleDientes = async (id, url) => {
         try {
             const { data } = await clienteAxios.get(`${url}/${id}`);
+            console.log(data.data);
             setDientes(data.data);
         } catch (error) {
             console.log(error);

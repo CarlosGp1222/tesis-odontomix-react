@@ -12,7 +12,7 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha, 
 
     const [estiloBorde, setEstiloBorde] = useState("");
     const [estiloLineas, setEstiloLineas] = useState("");
-    const { datosPosicion, handleDatosActual, handleErrorSweet, dientes, modal, handleEliminarDatos, setActualizar, actualizar, handleClickModal } = useDental();
+    const { datosPosicion, handleDatosActual, handleErrorSweet, dientes, modal, handleEliminarDatos, setActualizar, actualizar } = useDental();
 
     const aplicarEstilosInvertidos = idhemisferio_diente >= 5 && idhemisferio_diente <= 8;
 
@@ -87,7 +87,7 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha, 
 
         const grupoFiltrado = dientes.filter(diente => diente.ubicacion_dental.idhemisferio_diente == idhemisferio_diente && diente.posicion_dental.idposiciond == idposiciond && (diente.condiciones_dentales.idcondicionesd == 9 || diente.condiciones_dentales.idcondicionesd == 10 || diente.condiciones_dentales.idcondicionesd == 11));
 
-        console.log(grupoFiltrado);
+        // console.log(grupoFiltrado.length > 0);
         if (grupoFiltrado.length > 0 && grupoFiltrado.some(objeto => objeto.idubicaciond === idubicacion)) {
 
             let idParaURL = `${idHistorial}/${idubicacion}/${grupoFiltrado.find(objeto => objeto.idubicaciond === idubicacion).idcondicionesd}/${idposiciond}`;
