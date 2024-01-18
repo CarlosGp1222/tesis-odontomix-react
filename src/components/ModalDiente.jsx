@@ -172,13 +172,16 @@ export default function ModalDiente() {
 
   const checkboxesDientes = () => {
     if (!seleccionador || !ubicaciones.length || datosActual?.datosDiente) return null;
-
+    
     const rangoNumDientes = obtenerRango(datosActual.numDiente);
+    
     if (!rangoNumDientes) return null;
 
     let rangoUbicaciones = ubicaciones.filter(ubicacion => rangoNumDientes.includes(ubicacion.ubicacion_diente));
 
-    if (rangoUbicaciones.some(ubicacion => ubicacion.ubicacion_diente == 18 || ubicacion.ubicacion_diente == 55 || ubicacion.ubicacion_diente == 85 || ubicacion.ubicacion_diente == 48 || ubicacion.ubicacion_diente == 75 || ubicacion.ubicacion_diente == 38)) {
+    // console.log(rangoNumDientes);
+
+    if (rangoUbicaciones.some(ubicacion => ubicacion.ubicacion_diente == 18 || ubicacion.ubicacion_diente == 55 || ubicacion.ubicacion_diente == 85 || ubicacion.ubicacion_diente == 48 )) {
       rangoUbicaciones.sort((a, b) => b.ubicacion_diente - a.ubicacion_diente);
     }
 

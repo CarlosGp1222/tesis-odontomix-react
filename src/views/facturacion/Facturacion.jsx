@@ -4,6 +4,7 @@ import Spinner from '../../components/Spinner';
 import useSWR from 'swr';
 import clienteAxios from '../../config/axios';
 import useDental from '../../hooks/useDental';
+import { FaSearch } from 'react-icons/fa';
 export default function Facturacion() {
 
     const [items, setItems] = useState([]);
@@ -12,9 +13,10 @@ export default function Facturacion() {
     const fetcher = () => clienteAxios('api/item').then(datos => datos.data)
     const { data, isLoading } = useSWR('api/item', fetcher)
     const concepto = createRef();
+    const documento = createRef();
+    const [datosFactura, setDatosFactura] = useState([]);
 
 
-    // console.log(data);
     const { data: dataClientes, isLoading: isLoadingClientes } = useSWR('api/clientes', () => clienteAxios('api/clientes').then(datos => datos.data));
 
     const [clienteSeleccionado, setClienteSeleccionado] = useState({});
@@ -51,9 +53,6 @@ export default function Facturacion() {
     const eliminarDetalle = (id) => {
         setDetalles(detalles.filter(detalle => detalle.id !== id));
     };
-
-
-
 
     const calcularSubtotal = () => {
         return detalles.reduce((subtotal_detalle, detalle) => subtotal_detalle + Number(detalle.precio) * Number(detalle.cantidad), 0).toFixed(2);
@@ -118,7 +117,6 @@ export default function Facturacion() {
         });
         setDetalles(nuevosDetalles);
     };
-
 
     const actualizarDetalle = (id, campo, valor) => {
         const nuevosDetalles = detalles.map(detalle => {
@@ -219,6 +217,29 @@ export default function Facturacion() {
         }
     }
 
+    const handleLlamadoDeFactura = async () => {
+        const documentoFactura = documento.current.value;
+        if (documentoFactura === '') {
+            handleErrorSweet('Debe ingresar un numero de factura');
+            return;
+        }
+        try {
+            const response = await clienteAxios(`api/cabecera/${documentoFactura}`);
+            // console.log(response.data.data);
+            setDatosFactura(response.data.data);
+            if (response.data.data.length === 0) {
+                handleErrorSweet('No existe la factura');
+                return;
+            }
+            const cliente = dataClientes.data?.find(c => c.idcliente === response.data.data.idcliente);
+            setClienteSeleccionado(cliente);
+            // const detallesFactura = await clienteAxios(`api/detalle/${documentoFactura}`);
+        } catch (error) {
+            handleErrorSweet(error);
+        }
+    };
+    
+
     if (isLoading && isLoadingClientes) {
         return <Spinner />
     }
@@ -226,7 +247,7 @@ export default function Facturacion() {
 
     if (num_documento === '') {
         return;
-    } 
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 flex justify-center items-center">
@@ -249,22 +270,25 @@ export default function Facturacion() {
                 {/* buscador para numero factura */}
                 <div className='flex justify-center items-center'>
                     <div className='flex w-1/2 items-center gap-2'>
-                    <label className='font-serif font-bold text-base mb-2 w-1/3'>
-                        Buscar Factura:
-                    </label>
-                    <input
-                        type="text"
-                        // defaultValue={`Factura #  ${num_documento}`}
-                        className="shadow border py-2 px-3 rounded w-full h-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        placeholder="ingrese numero de factura"
-                        ref={concepto}
-                    ></input>
+                        <label className='font-serif font-bold text-base mb-2 w-1/3'>
+                            Buscar Factura:
+                        </label>
+                        <input
+                            type="text"
+                            // defaultValue={`Factura #  ${num_documento}`}
+                            className="shadow border py-2 px-3 rounded w-full h-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            placeholder="ingrese numero de factura"
+                            ref={documento}
+                        ></input>
+                        <button onClick={handleLlamadoDeFactura} className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
+                            <FaSearch />
+                        </button>
                     </div>
                 </div>
                 <hr className='my-4' />
                 <div>
                     <div className="grid grid-cols-2 gap-x-4 mt-8 gap-y-5">
-                    <div className='flex justify-center items-center'>
+                        <div className='flex justify-center items-center'>
                             <label className='font-serif font-bold text-base mb-2 w-1/3'>
                                 Concepto:
                             </label>
@@ -273,7 +297,7 @@ export default function Facturacion() {
                                 defaultValue={`Factura #  ${num_documento}`}
                                 className="shadow border py-2 px-3 rounded w-full h-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 placeholder="Concepto"
-                                
+
                             ></input>
                         </div>
                         <div className='flex justify-center items-center'>
@@ -284,7 +308,7 @@ export default function Facturacion() {
                                 className="shadow border py-2 px-3 rounded w-full h-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             >{num_documento}</label>
                         </div>
-                        
+
                     </div>
                 </div>
                 <hr className='my-4' />
@@ -309,6 +333,7 @@ export default function Facturacion() {
                         <input
                             list="clientes-datalist"
                             placeholder="Numero identificación"
+                            defaultValue={(clienteSeleccionado?.identificacion_cliente || '')}
                             className="shadow border py-2 px-3 rounded w-full h-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             onChange={(e) => seleccionarCliente(e.target.value)}
                         />
