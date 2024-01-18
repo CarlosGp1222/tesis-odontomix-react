@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { createRef, useEffect, useRef, useState } from 'react'
 import { MdDeleteForever } from "react-icons/md";
 import Spinner from '../../components/Spinner';
 import useSWR from 'swr';
@@ -7,21 +7,23 @@ import useDental from '../../hooks/useDental';
 export default function Facturacion() {
 
     const [items, setItems] = useState([]);
+    const [num_documento, setNum_documento] = useState('');
     const { handleErrorSweet, handleIngresarDatos } = useDental();
     const fetcher = () => clienteAxios('api/item').then(datos => datos.data)
     const { data, isLoading } = useSWR('api/item', fetcher)
+    const concepto = createRef();
 
+
+    // console.log(data);
     const { data: dataClientes, isLoading: isLoadingClientes } = useSWR('api/clientes', () => clienteAxios('api/clientes').then(datos => datos.data));
 
-    // Suponiendo que tienes un estado para el cliente seleccionado
     const [clienteSeleccionado, setClienteSeleccionado] = useState({});
 
     const seleccionarCliente = (identificacion_cliente) => {
-        // console.log(identificacion_cliente);
         const cliente = dataClientes.data?.find(c => c.identificacion_cliente === identificacion_cliente);
-        // console.log(cliente);
         if (cliente) {
             setClienteSeleccionado(cliente);
+
         }
     }
 
@@ -34,7 +36,7 @@ export default function Facturacion() {
             detalle: "",
             precio: 0,
             cantidad: 1,
-            iva: 12, // Predeterminado a 12
+            iva: 12,
             descuento_detalle: 0,
             subtotal_detalle: 0,
             existenItems: false,
@@ -50,7 +52,7 @@ export default function Facturacion() {
         setDetalles(detalles.filter(detalle => detalle.id !== id));
     };
 
-    
+
 
 
     const calcularSubtotal = () => {
@@ -85,8 +87,6 @@ export default function Facturacion() {
     const handleItemChange = (idDetalle, valor) => {
         const itemSeleccionado = items.find(i => i.tratamientos_dentales.nombre_tratamiento === valor);
         const precioItem = itemSeleccionado ? itemSeleccionado.precio_item : 0;
-        // console.log(items, valor);
-        // console.log(itemSeleccionado);
         const nuevosDetalles = detalles.map(detalle => {
             if (detalle.id === idDetalle) {
                 const detalleActualizado = {
@@ -123,7 +123,7 @@ export default function Facturacion() {
     const actualizarDetalle = (id, campo, valor) => {
         const nuevosDetalles = detalles.map(detalle => {
             if (detalle.id === id) {
-                
+
                 const detalleActualizado = { ...detalle, [campo]: valor };
                 // console.log((detalleActualizado.descuento_detalle));
                 const subtotal = Number(detalleActualizado.precio) * Number(detalleActualizado.cantidad);
@@ -131,14 +131,14 @@ export default function Facturacion() {
                 const totalConIVA = subtotal + (subtotal * iva);
                 detalleActualizado.subtotal_detalle = totalConIVA.toFixed(2);
 
-                
+
                 // console.log((detalleActualizado?.itemSeleccionado || '').trim() !== '' && detalleActualizado.idItem > 0 && detalleActualizado.cantidad === '' && detalleActualizado.descuento_detalle === '' && detalleActualizado.precio === '');
-                
+
                 const esCompleto = (detalleActualizado?.itemSeleccionado || '').trim() !== '' && detalleActualizado.idItem > 0 && detalleActualizado.cantidad !== '' && detalleActualizado.descuento_detalle !== '' && detalleActualizado.precio !== '';
-                
-                console.log((detalleActualizado?.itemSeleccionado || '').trim() !== '' && detalleActualizado.precio !== '' && detalleActualizado.idItem > 0 && detalleActualizado.cantidad !== '' && detalleActualizado.descuento_detalle !== '' );
-                
-                const cantidadMenor = Number(detalleActualizado.cantidad) < 1;                
+
+                console.log((detalleActualizado?.itemSeleccionado || '').trim() !== '' && detalleActualizado.precio !== '' && detalleActualizado.idItem > 0 && detalleActualizado.cantidad !== '' && detalleActualizado.descuento_detalle !== '');
+
+                const cantidadMenor = Number(detalleActualizado.cantidad) < 1;
                 const descuentoMenor = detalleActualizado.descuento_detalle < 0 || detalleActualizado.descuento_detalle === '' || Number(detalleActualizado.descuento_detalle) > Number(detalleActualizado.subtotal_detalle);
 
                 const precioMenor = detalleActualizado.precio <= 0 || detalleActualizado.precio === '';
@@ -158,12 +158,12 @@ export default function Facturacion() {
     useEffect(() => {
         if (data && data.data) {
             setItems(data.data);
+            let num = data.data.find(i => i.num_documento != '');
+            setNum_documento(num.n_documento);
         }
-    }, [data]);
+    }, [data, num_documento]);
 
-    const handleEnviarFactura = async() => {
-        // console.log(clienteSeleccionado.idcliente);
-        // console.log(detalles.length);
+    const handleEnviarFactura = async () => {
         const existeError = detalles.find(detalle => detalle.completo === false);
         const existeErrorPrecio = detalles.find(detalle => detalle.precioMenor === true);
         const existeErrorCantidad = detalles.find(detalle => detalle.cantidadMenor === true);
@@ -173,13 +173,13 @@ export default function Facturacion() {
         if (!clienteSeleccionado.idcliente) {
             handleErrorSweet('Debe seleccionar un cliente');
             return;
-        }else if(detalles.length === 0){
+        } else if (detalles.length === 0) {
             handleErrorSweet('Debe agregar al menos un detalle');
             return;
-        }else if (existeError) {
+        } else if (existeError) {
             handleErrorSweet('Debe completar todos los detalles');
-            return;   
-        }else if (existeErrorPrecio) {
+            return;
+        } else if (existeErrorPrecio) {
             handleErrorSweet('El precio no puede estar vacio o ser menor a 1');
             return;
         } else if (existeErrorCantidad) {
@@ -188,7 +188,7 @@ export default function Facturacion() {
         } else if (existeErrorDescuento) {
             handleErrorSweet('El descuento es obligatorio, no puede ser menor a 0 ni mayor al total');
             return;
-        }else{
+        } else {
             const factura = {
                 idcliente: clienteSeleccionado.idcliente,
                 // subtotal_factura: calcularSubtotal(),
@@ -197,11 +197,8 @@ export default function Facturacion() {
                 total_factura: calcularTotal(),
                 // detalles
             };
-
+            console.log(factura);
             const data = await handleIngresarDatos(factura, 'api/cabecera', false, true, false);
-            console.log(data);
-            // console.log(detalles);
-            // return;
             if (data) {
                 const idFactura = data.idcabecerafactura;
                 detalles.forEach(async detalle => {
@@ -213,27 +210,23 @@ export default function Facturacion() {
                         descuento_detalle: detalle.descuento_detalle,
                         iva_detalle: detalle.iva,
                         subtotal_detalle: detalle.subtotal_detalle,
-                        
+
                     }
+                    console.log(detalleFactura);
                     await handleIngresarDatos(detalleFactura, 'api/detalle', false, true, false);
                 });
             }
-            // console.log(factura);
         }
-        // const factura = {
-        //     idcliente: clienteSeleccionado.idcliente,
-        //     subtotal_factura: calcularSubtotal(),
-        //     descuento_factura: calcularDescuentoTotal(),
-        //     iva_factura: calcularIVA(),
-        //     total_factura: calcularTotal(),
-        //     detalles
-        // };
     }
 
     if (isLoading && isLoadingClientes) {
         return <Spinner />
     }
 
+
+    if (num_documento === '') {
+        return;
+    } 
 
     return (
         <div className="min-h-screen bg-gray-100 flex justify-center items-center">
@@ -251,6 +244,48 @@ export default function Facturacion() {
 
                 <div className='text-base font-bold flex-1 text-center '>
                     <h1 className="font-serif text-4xl">Factura</h1>
+                </div>
+                <hr className='my-4' />
+                {/* buscador para numero factura */}
+                <div className='flex justify-center items-center'>
+                    <div className='flex w-1/2 items-center gap-2'>
+                    <label className='font-serif font-bold text-base mb-2 w-1/3'>
+                        Buscar Factura:
+                    </label>
+                    <input
+                        type="text"
+                        // defaultValue={`Factura #  ${num_documento}`}
+                        className="shadow border py-2 px-3 rounded w-full h-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        placeholder="ingrese numero de factura"
+                        ref={concepto}
+                    ></input>
+                    </div>
+                </div>
+                <hr className='my-4' />
+                <div>
+                    <div className="grid grid-cols-2 gap-x-4 mt-8 gap-y-5">
+                    <div className='flex justify-center items-center'>
+                            <label className='font-serif font-bold text-base mb-2 w-1/3'>
+                                Concepto:
+                            </label>
+                            <input
+                                type="text"
+                                defaultValue={`Factura #  ${num_documento}`}
+                                className="shadow border py-2 px-3 rounded w-full h-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                placeholder="Concepto"
+                                
+                            ></input>
+                        </div>
+                        <div className='flex justify-center items-center'>
+                            <label className='font-serif font-bold text-base mb-2 w-1/3'>
+                                N° Factura:
+                            </label>
+                            <label
+                                className="shadow border py-2 px-3 rounded w-full h-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            >{num_documento}</label>
+                        </div>
+                        
+                    </div>
                 </div>
                 <hr className='my-4' />
                 <div className='flex justify-between'>

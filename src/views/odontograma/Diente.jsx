@@ -93,7 +93,7 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha, 
             let idParaURL = `${idHistorial}/${idubicacion}/${grupoFiltrado.find(objeto => objeto.idubicaciond === idubicacion).idcondicionesd}/${idposiciond}`;
             // console.log();
             handleEliminarDatos(idParaURL, 'api/dientes2', `Elimina ls dientes con la condicion ${grupoFiltrado.find(objeto => objeto.idubicaciond === idubicacion).condiciones_dentales.nombre_condicion} en el ${grupoFiltrado.find(objeto => objeto.idubicaciond === idubicacion).ubicacion_dental.hemisferio.nombre_hemisferio}`);
-            setTimeout(() => {                
+            setTimeout(() => {
                 setActualizar(!actualizar);
             }, 2000);
 
@@ -265,8 +265,13 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha, 
 
                 )}
                 {estiloLineas == 'N' && (
-                    <div style={iconContainerStyles}>
-                        <FaGripLines style={{ width: '38px', height: '38px', color: 'blue', pointerEvents: 'none' }} />
+                    <div style={iconContainerStyles} className='flex justify-between'>
+                        <div >
+                            <FaGripLines style={{ width: '38px', height: '38px', color: 'blue', pointerEvents: 'none' }} />
+                        </div>
+                        <div >
+                            <FaGripLines style={{ width: '38px', height: '38px', color: 'blue', pointerEvents: 'none' }} />
+                        </div>
                     </div>
                 )}
                 <div className={`absolute inset-0 flex items-center justify-center`}>

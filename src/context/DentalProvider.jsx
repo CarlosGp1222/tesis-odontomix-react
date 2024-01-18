@@ -176,7 +176,7 @@ const DentalProvider = ({ children }) => {
                         window.location.reload();
                     }, 2000);
                 }
-                console.log(data);
+                // console.log(data);
                 return data.data;
             } else {
                 const { data } = await clienteAxios.post(`${url}`, datos);
