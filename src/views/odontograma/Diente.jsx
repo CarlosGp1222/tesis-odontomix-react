@@ -81,9 +81,9 @@ const Diente = ({ numero, idHistorial, idubicacion, nombre_diente, numeroFicha, 
 
     const handlePartClick = (idposiciond) => {
 
-        // if (estado_historial === 1) {
-        //     return handleErrorSweet('No se puede modificar el odontograma, el paciente ya tiene un tratamiento finalizado');
-        // }
+        if (estado_historial === 1) {
+            return handleErrorSweet('No se puede modificar el odontograma, el paciente ya tiene un tratamiento finalizado');
+        }
 
         const grupoFiltrado = dientes.filter(diente => diente.ubicacion_dental.idhemisferio_diente == idhemisferio_diente && diente.posicion_dental.idposiciond == idposiciond && (diente.condiciones_dentales.idcondicionesd == 9 || diente.condiciones_dentales.idcondicionesd == 10 || diente.condiciones_dentales.idcondicionesd == 11));
 
